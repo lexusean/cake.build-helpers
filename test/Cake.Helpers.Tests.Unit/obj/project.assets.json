@@ -374,10 +374,10 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\github\\lexusean\\cake.helpers\\test\\Cake.Helpers.Tests.Unit\\Cake.Helpers.Tests.Unit.csproj",
+      "projectUniqueName": "D:\\github\\lexusean\\cake.build-helpers\\test\\Cake.Helpers.Tests.Unit\\Cake.Helpers.Tests.Unit.csproj",
       "projectName": "Cake.Helpers.Tests.Unit",
-      "projectPath": "D:\\github\\lexusean\\cake.helpers\\test\\Cake.Helpers.Tests.Unit\\Cake.Helpers.Tests.Unit.csproj",
-      "outputPath": "D:\\github\\lexusean\\cake.helpers\\test\\Cake.Helpers.Tests.Unit\\obj\\",
+      "projectPath": "D:\\github\\lexusean\\cake.build-helpers\\test\\Cake.Helpers.Tests.Unit\\Cake.Helpers.Tests.Unit.csproj",
+      "outputPath": "D:\\github\\lexusean\\cake.build-helpers\\test\\Cake.Helpers.Tests.Unit\\obj\\",
       "projectStyle": "PackageReference",
       "crossTargeting": true,
       "originalTargetFrameworks": [
@@ -386,8 +386,8 @@
       "frameworks": {
         "net452": {
           "projectReferences": {
-            "D:\\github\\lexusean\\cake.helpers\\src\\Cake.Helpers\\Cake.Helpers.csproj": {
-              "projectPath": "D:\\github\\lexusean\\cake.helpers\\src\\Cake.Helpers\\Cake.Helpers.csproj"
+            "D:\\github\\lexusean\\cake.build-helpers\\src\\Cake.Helpers\\Cake.Helpers.csproj": {
+              "projectPath": "D:\\github\\lexusean\\cake.build-helpers\\src\\Cake.Helpers\\Cake.Helpers.csproj"
             }
           }
         }
