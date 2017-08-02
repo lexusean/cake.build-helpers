@@ -6,7 +6,11 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Cake.Core;
+using Cake.Helpers.Command;
+using Cake.Helpers.DotNetCore;
 using Cake.Helpers.Tasks;
+
+[assembly: InternalsVisibleTo("Cake.Helpers.Tests.Unit")]
 
 namespace Cake.Helpers
 {
@@ -26,7 +30,7 @@ namespace Cake.Helpers
         throw new ArgumentNullException(nameof(createInstanceFunc));
 
       var type = typeof(TSingletonType);
-      var obj = _SingletonCache.GetOrAdd(type, t => createInstanceFunc);
+      var obj = _SingletonCache.GetOrAdd(type, x => createInstanceFunc());
 
       var t = obj as TSingletonType;
       if (t != null)
@@ -40,6 +44,16 @@ namespace Cake.Helpers
     public static TaskHelper GetTaskHelper()
     {
       return GetInstance<TaskHelper>(() => new TaskHelper());
+    }
+
+    public static DotNetCoreHelper GetDotNetCoreHelper()
+    {
+      return GetInstance<DotNetCoreHelper>(() => new DotNetCoreHelper());
+    }
+
+    public static CommandHelper GetCommandHelper()
+    {
+      return GetInstance<CommandHelper>(() => new CommandHelper(GetTaskHelper()));
     }
   }
 }

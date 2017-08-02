@@ -70,7 +70,11 @@ namespace Cake.Helpers.Tasks
     }
 
     /// <inheritdoc />
-    public bool BuildAllDependencies { get; set; }
+    public bool BuildAllDependencies
+    {
+      get { return HelperSettingsCache.BuildAllDependencies; }
+      set { HelperSettingsCache.BuildAllDependencies = value; }
+    }
 
     /// <inheritdoc />
     public ICakeContext Context { get; set; }

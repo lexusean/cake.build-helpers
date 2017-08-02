@@ -15,6 +15,21 @@ namespace Cake.Helpers.Build
   public static class BuildHelperAlias
   {
     [CakeMethodAlias]
+    public static CakeTaskBuilder<ActionTask> BuildCleanTask(
+      this ICakeContext context,
+      string taskName,
+      bool isTarget = true,
+      string parentTaskName = "")
+    {
+      if (context == null)
+        throw new ArgumentNullException(nameof(context));
+
+      return context.TaskHelper()
+        .AddToBuildCleanTask(taskName, isTarget, parentTaskName)
+        .GetBuildTask();
+    }
+
+    [CakeMethodAlias]
     public static CakeTaskBuilder<ActionTask> PreBuildTask(
       this ICakeContext context,
       string taskName,

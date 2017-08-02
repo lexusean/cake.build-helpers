@@ -16,6 +16,22 @@ namespace Cake.Helpers.Test
   public static class TestHelperAlias
   {
     [CakeMethodAlias]
+    public static CakeTaskBuilder<ActionTask> TestCleanTask(
+      this ICakeContext context,
+      string taskName,
+      string testCategory,
+      bool isTarget = true,
+      string parentTaskName = "")
+    {
+      if (context == null)
+        throw new ArgumentNullException(nameof(context));
+
+      return context.TaskHelper()
+        .AddToTestCleanTask(taskName, testCategory, isTarget, parentTaskName)
+        .GetBuildTask();
+    }
+
+    [CakeMethodAlias]
     public static CakeTaskBuilder<ActionTask> TestTask(
       this ICakeContext context,
       string taskName,

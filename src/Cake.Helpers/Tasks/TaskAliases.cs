@@ -37,5 +37,37 @@ namespace Cake.Helpers.Tasks
         .GetTask(taskName, isTarget, taskCategory, taskType)
         .GetBuildTask();
     }
+
+    [CakeMethodAlias]
+    public static void AddRunTarget(
+      this ICakeContext context,
+      Func<string, CakeReport> runTargetFunc)
+    {
+      if (context == null)
+        throw new ArgumentNullException(nameof(context));
+
+      if (runTargetFunc == null)
+        throw new ArgumentNullException(nameof(runTargetFunc));
+
+      SingletonFactory.Context = context;
+      var taskHelper = SingletonFactory.GetTaskHelper();
+      taskHelper.AddRunTarget(runTargetFunc);
+    }
+
+    [CakeMethodAlias]
+    public static void AddTaskTarget(
+      this ICakeContext context,
+      Func<string, CakeTaskBuilder<ActionTask>> taskTargetFunc)
+    {
+      if (context == null)
+        throw new ArgumentNullException(nameof(context));
+
+      if (taskTargetFunc == null)
+        throw new ArgumentNullException(nameof(taskTargetFunc));
+
+      SingletonFactory.Context = context;
+      var taskHelper = SingletonFactory.GetTaskHelper();
+      taskHelper.AddTaskTarget(taskTargetFunc);
+    }
   }
 }
