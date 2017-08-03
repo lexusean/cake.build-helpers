@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,10 +9,24 @@ using Cake.Helpers.Tasks;
 
 namespace Cake.Helpers.Clean
 {
-  public static class CleanHelperExtensions
+  [ExcludeFromCodeCoverage]
+  internal static class CleanHelperExtensions
   {
+    [ExcludeFromCodeCoverage]
+    internal static IHelperTask GetDefaultCleanTask(
+      this ITaskHelper helper)
+    {
+      if (helper == null)
+        return null;
+
+      var targetName = "All";
+      var taskName = $"Clean-{targetName}";
+
+      return helper.GetTask(taskName, true, "Clean");
+    }
+
     public static IHelperTask GetCleanTask(
-      this TaskHelper helper,
+      this ITaskHelper helper,
       string cleanCategory = "",
       string targetName = "All",
       bool isTarget = true)
@@ -28,11 +43,18 @@ namespace Cake.Helpers.Clean
       cleanCategory = $"Clean-{cleanCategory}";
       var taskName = $"{cleanCategory}-{targetName}";
 
-      return helper.GetTask(taskName, isTarget, "Clean", cleanCategory);
+      var task = helper.GetTask(taskName, isTarget, "Clean", cleanCategory);
+      if (targetName == "All")
+      {
+        var defaultTask = helper.GetDefaultCleanTask();
+        helper.AddTaskDependency(defaultTask, task);
+      }
+
+      return task;
     }
 
     public static IHelperTask AddToCleanTask(
-      this TaskHelper helper,
+      this ITaskHelper helper,
       string taskName,
       string cleanCategory = "",
       bool isTarget = true,
@@ -47,12 +69,12 @@ namespace Cake.Helpers.Clean
       var newTaskName = isTarget ? taskName : $"{parentTaskName}-{taskName}";
       var parentTask = isTarget
         ? helper.GetCleanTask(cleanCategory)
-        : helper.GetCleanTask(cleanCategory, newTaskName, false);
+        : helper.AddToCleanTask(parentTaskName, cleanCategory);
       var newTask = helper.GetCleanTask(cleanCategory, newTaskName, isTarget);
 
       parentTask
         .GetBuildTask()
-        .IsDependentOn(newTask.GetBuildTask());
+        .IsDependentOn(newTask.TaskName);
 
       return newTask;
     }

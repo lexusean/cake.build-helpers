@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Cake.Core;
 using Cake.Core.Annotations;
+using Cake.Helpers.Settings;
 
 namespace Cake.Helpers
 {
@@ -12,21 +13,14 @@ namespace Cake.Helpers
   public static class HelperAlias
   {
     [CakePropertyAlias]
-    public static bool HelperBuildAllDependencies(this ICakeContext context)
+    public static IHelperSettings HelperSettings(this ICakeContext context)
     {
       if (context == null)
         throw new ArgumentNullException(nameof(context));
 
-      return HelperSettingsCache.BuildAllDependencies;
-    }
+      SingletonFactory.Context = context;
 
-    [CakeMethodAlias]
-    public static void SetHelperBuildAllDependencies(this ICakeContext context, bool buildAllDependencies = false)
-    {
-      if (context == null)
-        throw new ArgumentNullException(nameof(context));
-
-      HelperSettingsCache.BuildAllDependencies = buildAllDependencies;
+      return SingletonFactory.GetHelperSettings();
     }
   }
 }

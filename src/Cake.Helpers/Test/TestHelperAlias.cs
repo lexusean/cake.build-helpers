@@ -1,12 +1,6 @@
-﻿using Cake.Core.Annotations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using Cake.Core;
-using Cake.Helpers.Build;
-using Cake.Helpers.Clean;
+using Cake.Core.Annotations;
 using Cake.Helpers.Tasks;
 
 namespace Cake.Helpers.Test
@@ -15,6 +9,8 @@ namespace Cake.Helpers.Test
   [CakeAliasCategory("Test")]
   public static class TestHelperAlias
   {
+    #region Static Members
+
     [CakeMethodAlias]
     public static CakeTaskBuilder<ActionTask> TestCleanTask(
       this ICakeContext context,
@@ -46,5 +42,7 @@ namespace Cake.Helpers.Test
         .AddToTestTask(taskName, testCategory, isTarget, parentTaskName)
         .GetBuildTask();
     }
+
+    #endregion
   }
 }

@@ -12,6 +12,7 @@ using Cake.Common.Tools.DotNetCore.Test;
 using Cake.Core;
 using Cake.Core.IO;
 using Cake.Helpers.Build;
+using Cake.Helpers.Settings;
 using Cake.Helpers.Test;
 
 namespace Cake.Helpers.DotNetCore
@@ -26,9 +27,11 @@ namespace Cake.Helpers.DotNetCore
     IProjectConfiguration AddProjectConfiguration(IProjectConfiguration projConfig);
   }
 
-  public class DotNetCoreHelper : IDotNetCoreHelper
+  internal class DotNetCoreHelper : IDotNetCoreHelper
   {
     #region Private Fields
+
+    private readonly IHelperSettings _helperSettings = SingletonFactory.GetHelperSettings();
 
     private readonly List<IProjectConfiguration> _projects = new List<IProjectConfiguration>();
     private readonly List<ITestConfiguration> _Tests = new List<ITestConfiguration>();
@@ -38,8 +41,7 @@ namespace Cake.Helpers.DotNetCore
     #region Ctor
 
     internal DotNetCoreHelper()
-    {
-    }
+    { }
 
     #endregion
 
@@ -136,7 +138,7 @@ namespace Cake.Helpers.DotNetCore
         {
           var restoreSettings = new DotNetCoreRestoreSettings
           {
-            Sources = DotNetCoreSettingsCache.NugetSources
+            Sources = this._helperSettings.DotNetCoreSettings.NugetSettings.GetFeedUrls().ToList()
           };
 
           this.Context.DotNetCoreRestore(projConfig.GetRelativeSlnFilePath().FullPath, restoreSettings);
@@ -168,7 +170,7 @@ namespace Cake.Helpers.DotNetCore
             Filter = testConfig.GetDotNetCoreCategoryString(),
             Configuration = projConfig.Configuration,
             Framework = projConfig.Framework,
-            NoBuild = !HelperSettingsCache.BuildAllDependencies
+            NoBuild = !this._helperSettings.RunAllDependencies
           };
 
           foreach (var testProject in projConfig.TestProjects)
@@ -195,7 +197,7 @@ namespace Cake.Helpers.DotNetCore
 
     public DirectoryPath BuildTempFolder
     {
-      get { return this.Context.Directory(DotNetCoreSettingsCache.BuildTempFolder); }
+      get { return this.Context.Directory(this._helperSettings.DotNetCoreSettings.BuildSettings.BuildTempFolder); }
     }
 
     public IEnumerable<IProjectConfiguration> Projects
@@ -210,7 +212,7 @@ namespace Cake.Helpers.DotNetCore
 
     public DirectoryPath TestTempFolder
     {
-      get { return this.Context.Directory(DotNetCoreSettingsCache.TestTempFolder); }
+      get { return this.Context.Directory(this._helperSettings.DotNetCoreSettings.TestSettings.TestTempFolder); }
     }
 
     public IProjectConfiguration AddProjectConfiguration(IProjectConfiguration projConfig)
@@ -224,6 +226,11 @@ namespace Cake.Helpers.DotNetCore
       this.RegisterPreBuildTasks(projConfig);
       this.RegisterBuildTasks(projConfig);
       this.RegisterPostBuildTasks(projConfig);
+
+      foreach (var testConfig in projConfig.TestConfigurations)
+      {
+        this.RegisterTestTasks(projConfig, testConfig);
+      }
 
       projConfig.TestConfigAdded += this.RegisterTestTasks;
 
@@ -249,21 +256,23 @@ namespace Cake.Helpers.DotNetCore
 
   public static class DotNetCoreHelperExtensions
   {
+    #region Static Members
+
     public static IProjectConfiguration AddProjectConfiguration(
-      this IDotNetCoreHelper helper, 
+      this IDotNetCoreHelper helper,
       string filePathStr,
       Action<IProjectConfiguration> setupConfig = null)
     {
-      if(helper == null)
+      if (helper == null)
         throw new ArgumentNullException(nameof(helper));
 
-      if(string.IsNullOrWhiteSpace(filePathStr))
+      if (string.IsNullOrWhiteSpace(filePathStr))
         throw new ArgumentNullException(filePathStr);
 
       var filePath = helper.Context.File(filePathStr).Path;
       filePath = helper.Context.MakeRelative(filePath);
 
-      if(!helper.Context.FileExists(filePath))
+      if (!helper.Context.FileExists(filePath))
         throw new FileNotFoundException("Failed to find project file", filePath.FullPath);
 
       var projConfig = helper.GetProjectConfiguration(filePath);
@@ -272,5 +281,7 @@ namespace Cake.Helpers.DotNetCore
 
       return helper.AddProjectConfiguration(projConfig);
     }
+
+    #endregion
   }
 }

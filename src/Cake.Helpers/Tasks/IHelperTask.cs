@@ -18,7 +18,6 @@ namespace Cake.Helpers.Tasks
 
   public interface IHelperRunTarget
   {
-    void SetRunTarget(Func<string, CakeReport> runTargetFunc);
     void RunTarget(IHelperTask task);
     void RunTarget(string targetName);
   }
@@ -26,9 +25,11 @@ namespace Cake.Helpers.Tasks
   public interface IHelperTaskHandler : IHelper
   {
     IEnumerable<IHelperTask> Tasks { get; }
-    void SetTaskTarget(Func<string, CakeTaskBuilder<ActionTask>> scriptHostTaskFunc);
     IHelperTask AddTask(string taskName);
     void RemoveTask(string taskName);
     bool BuildAllDependencies { get; set; }
   }
+
+  public interface ITaskHelper : IHelperTaskHandler, IHelperRunTarget, IHelperContext
+  { }
 }

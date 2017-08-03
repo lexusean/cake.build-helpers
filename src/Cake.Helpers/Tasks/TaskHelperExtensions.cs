@@ -9,16 +9,6 @@ namespace Cake.Helpers.Tasks
   {
     #region Static Members
 
-    public static TaskHelper AddRunTarget(this TaskHelper helper, Func<string, CakeReport> runTargetFunc)
-    {
-      if (helper == null)
-        throw new ArgumentNullException(nameof(helper));
-
-      helper.SetRunTarget(runTargetFunc);
-
-      return helper;
-    }
-
     public static void AddTaskDependency(
       this IHelperTaskHandler helper,
       CakeTaskBuilder<ActionTask> task,
@@ -53,17 +43,6 @@ namespace Cake.Helpers.Tasks
         return;
 
       helper.AddTaskDependency(task, dependentTask.TaskName);
-    }
-
-    public static TaskHelper AddTaskTarget(this TaskHelper helper,
-      Func<string, CakeTaskBuilder<ActionTask>> taskTargetFunc)
-    {
-      if (helper == null)
-        throw new ArgumentNullException(nameof(helper));
-
-      helper.SetTaskTarget(taskTargetFunc);
-
-      return helper;
     }
 
     public static CakeTaskBuilder<ActionTask> GetBuildTask(this IHelperTask task)

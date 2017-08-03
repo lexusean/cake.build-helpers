@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cake.Core;
 using Cake.Core.IO;
 using Cake.Testing;
@@ -16,12 +17,61 @@ namespace Cake.Helpers.Tests.Unit
     [TestInitialize]
     public void TestInit()
     {
-      SingletonFactory.Context = null;
+      SingletonFactory.ClearFactory();
     }
 
     #endregion
 
     #region Test Methods
+
+    [TestMethod]
+    [TestCategory(Global.TestType)]
+    public void SingletonFactoryClear_Success()
+    {
+      var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
+      SingletonFactory.Context = context;
+
+      var settings = SingletonFactory.GetHelperSettings();
+      Assert.IsNotNull(settings);
+
+      SingletonFactory.ClearFactory();
+      Assert.IsNull(SingletonFactory.Context);
+
+      SingletonFactory.Context = context;
+      var newSettings = SingletonFactory.GetHelperSettings();
+
+      Assert.IsNotNull(newSettings);
+      Assert.AreNotEqual(settings, newSettings);
+    }
+
+    [TestMethod]
+    [TestCategory(Global.TestType)]
+    public void GetHelperSettings_Success()
+    {
+      var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
+      SingletonFactory.Context = context;
+
+      var settings = SingletonFactory.GetHelperSettings();
+
+      Assert.IsNotNull(settings);
+      Assert.IsNotNull(settings.Context);
+      Assert.IsFalse(settings.RunAllDependencies);
+
+      Assert.IsNotNull(settings.DotNetCoreSettings);
+
+      Assert.IsNotNull(settings.DotNetCoreSettings.NugetSettings);
+      Assert.IsNotNull(settings.DotNetCoreSettings.NugetSettings.Context);
+      Assert.AreEqual(1, settings.DotNetCoreSettings.NugetSettings.NugetSources.Count());
+
+      Assert.IsNotNull(settings.DotNetCoreSettings.BuildSettings);
+      Assert.AreEqual("./BuildTemp", settings.DotNetCoreSettings.BuildSettings.BuildTempFolder);
+
+      Assert.IsNotNull(settings.DotNetCoreSettings.TestSettings);
+      Assert.AreEqual("./TestTemp", settings.DotNetCoreSettings.TestSettings.TestTempFolder);
+
+      var newSettings = SingletonFactory.GetHelperSettings();
+      Assert.AreEqual(settings, newSettings);
+    }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
@@ -43,6 +93,9 @@ namespace Cake.Helpers.Tests.Unit
       Assert.IsNotNull(helper);
       Assert.IsNotNull(helper.Context);
       Assert.AreEqual(context, helper.Context);
+
+      var newHelper = SingletonFactory.GetCommandHelper();
+      Assert.AreEqual(helper, newHelper);
     }
 
     [TestMethod]
@@ -57,6 +110,9 @@ namespace Cake.Helpers.Tests.Unit
       Assert.IsNotNull(helper);
       Assert.IsNotNull(helper.Context);
       Assert.AreEqual(context, helper.Context);
+
+      var newHelper = SingletonFactory.GetDotNetCoreHelper();
+      Assert.AreEqual(helper, newHelper);
     }
 
     [TestMethod]
@@ -79,6 +135,9 @@ namespace Cake.Helpers.Tests.Unit
       Assert.IsNotNull(taskHelper);
       Assert.IsNotNull(taskHelper.Context);
       Assert.AreEqual(context, taskHelper.Context);
+
+      var newHelper = SingletonFactory.GetTaskHelper();
+      Assert.AreEqual(taskHelper, newHelper);
     }
 
     #endregion

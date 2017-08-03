@@ -1,23 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Cake.Core;
+using Cake.Helpers.Settings;
 
 namespace Cake.Helpers.Tasks
 {
-  public class TaskHelper : IHelperContext, IHelperRunTarget, IHelperTaskHandler
+  internal class TaskHelper : IHelperContext, ITaskHelper
   {
-    private TaskCache Cache { get; set; } = new TaskCache();
-    private Func<string, CakeReport> RunTargetFunc { get; set; }
-    private Func<string, CakeTaskBuilder<ActionTask>> ScriptHostTaskFunc { get; set; }
+    #region Private Properties
+
+    private TaskCache Cache { get; } = new TaskCache();
+
+    #endregion
+
+    #region Private Fields
+
+    private readonly IHelperSettings _HelperSettings = SingletonFactory.GetHelperSettings();
+
+    #endregion
+
+    #region Private Methods
+
+    private CakeTaskBuilder<ActionTask> AddScriptTask(string taskName)
+    {
+      if (this._HelperSettings.TaskTargetFunc == null)
+        throw new ArgumentNullException(nameof(this._HelperSettings.TaskTargetFunc));
+
+      return this._HelperSettings.TaskTargetFunc?.Invoke(taskName);
+    }
+
+    #endregion
+
+    #region IHelperContext Members
 
     /// <inheritdoc />
-    public void SetRunTarget(Func<string, CakeReport> runTargetFunc)
-    {
-      this.RunTargetFunc = runTargetFunc;
-    }
+    public ICakeContext Context { get; set; }
+
+    #endregion
+
+    #region IHelperRunTarget Members
 
     /// <inheritdoc />
     public void RunTarget(IHelperTask task)
@@ -28,7 +49,21 @@ namespace Cake.Helpers.Tasks
     /// <inheritdoc />
     public void RunTarget(string targetName)
     {
-      this.RunTargetFunc?.Invoke(targetName);
+      if (this._HelperSettings.RunTargetFunc == null)
+        throw new ArgumentNullException(nameof(this._HelperSettings.RunTargetFunc));
+
+      this._HelperSettings.RunTargetFunc?.Invoke(targetName);
+    }
+
+    #endregion
+
+    #region IHelperTaskHandler Members
+
+    /// <inheritdoc />
+    public bool BuildAllDependencies
+    {
+      get { return this._HelperSettings.RunAllDependencies; }
+      set { this._HelperSettings.RunAllDependencies = value; }
     }
 
     /// <inheritdoc />
@@ -38,22 +73,13 @@ namespace Cake.Helpers.Tasks
     }
 
     /// <inheritdoc />
-    public void SetTaskTarget(Func<string, CakeTaskBuilder<ActionTask>> scriptHostTaskFunc)
-    {
-      this.ScriptHostTaskFunc = scriptHostTaskFunc;
-    }
-
-    /// <inheritdoc />
     public IHelperTask AddTask(string taskName)
     {
       if (this.Cache.ContainsKey(taskName))
         return this.Cache[taskName];
 
-      if (this.ScriptHostTaskFunc == null)
-        return null;
-
-      var newTask = this.ScriptHostTaskFunc(taskName).Task;
-      var newHelperTask = new HelperTask()
+      var newTask = this.AddScriptTask(taskName).Task;
+      var newHelperTask = new HelperTask
       {
         Task = newTask
       };
@@ -69,14 +95,6 @@ namespace Cake.Helpers.Tasks
       this.Cache.Remove(taskName);
     }
 
-    /// <inheritdoc />
-    public bool BuildAllDependencies
-    {
-      get { return HelperSettingsCache.BuildAllDependencies; }
-      set { HelperSettingsCache.BuildAllDependencies = value; }
-    }
-
-    /// <inheritdoc />
-    public ICakeContext Context { get; set; }
+    #endregion
   }
 }

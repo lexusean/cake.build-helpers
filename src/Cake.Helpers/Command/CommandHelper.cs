@@ -4,6 +4,7 @@ using System.Linq;
 using Cake.Common;
 using Cake.Common.Diagnostics;
 using Cake.Core;
+using Cake.Helpers.Settings;
 using Cake.Helpers.Tasks;
 
 namespace Cake.Helpers.Command
@@ -24,20 +25,21 @@ namespace Cake.Helpers.Command
   {
     #region Private Properties
 
-    private TaskHelper TaskHelper { get; }
+    private ITaskHelper TaskHelper { get; }
 
     #endregion
 
     #region Private Fields
 
     private readonly List<ICommandArgument> _Arguments = new List<ICommandArgument>();
+    private readonly IHelperSettings _helperSettings = SingletonFactory.GetHelperSettings();
 
     #endregion
 
     #region Ctor
 
     internal CommandHelper(
-      TaskHelper taskHelper)
+      ITaskHelper taskHelper)
     {
       if (taskHelper == null)
         throw new ArgumentNullException(nameof(taskHelper));
@@ -242,6 +244,8 @@ namespace Cake.Helpers.Command
 
     public void Run()
     {
+      this._helperSettings.SetupSetting();
+
       var isHelp = this.HelpArgument.HasArgument(this.Context);
       this.Context.Debug("Help Set: {0}", isHelp);
 

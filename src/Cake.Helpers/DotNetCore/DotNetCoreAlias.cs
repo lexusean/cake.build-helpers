@@ -4,6 +4,8 @@ using Cake.Common.IO;
 using Cake.Core;
 using Cake.Core.Annotations;
 using Cake.Core.IO;
+using Cake.Helpers.Nuget;
+using Cake.Helpers.Settings;
 
 namespace Cake.Helpers.DotNetCore
 {
@@ -13,105 +15,60 @@ namespace Cake.Helpers.DotNetCore
   {
     #region Static Members
 
-    [CakeMethodAlias]
-    public static void AddDotNetCoreHelperNugetSource(this ICakeContext context, string src)
+    [CakePropertyAlias]
+    public static IDotNetCoreHelperSettings DotNetCoreHelperSettings(this ICakeContext context)
     {
       if (context == null)
         throw new ArgumentNullException(nameof(context));
 
-      if (string.IsNullOrWhiteSpace(src))
+      return SingletonFactory.GetHelperSettings().DotNetCoreSettings;
+    }
+
+    [CakePropertyAlias]
+    public static IDotNetCoreBuildHelperSettings DotNetCoreBuildHelperSettings(this ICakeContext context)
+    {
+      if (context == null)
+        throw new ArgumentNullException(nameof(context));
+
+      return SingletonFactory.GetHelperSettings().DotNetCoreSettings.BuildSettings;
+    }
+
+    [CakePropertyAlias]
+    public static IDotNetCoreTestHelperSettings DotNetCoreTestHelperSettings(this ICakeContext context)
+    {
+      if (context == null)
+        throw new ArgumentNullException(nameof(context));
+
+      return SingletonFactory.GetHelperSettings().DotNetCoreSettings.TestSettings;
+    }
+
+    [CakeMethodAlias]
+    public static void AddDotNetCoreHelperNugetSource(this ICakeContext context, string feedSource, Action<INugetSource> sourceConfig = null)
+    {
+      if (context == null)
+        throw new ArgumentNullException(nameof(context));
+
+      if (string.IsNullOrWhiteSpace(feedSource))
         return;
 
-      DotNetCoreSettingsCache.NugetSources.Add(src);
+      var settings = SingletonFactory.GetHelperSettings().DotNetCoreSettings.NugetSettings;
+      var source = settings.AddSource(feedSource);
+      sourceConfig?.Invoke(source);
     }
 
     [CakeMethodAlias]
-    public static IProjectConfiguration AddDotNetCoreHelperProject(
-      this ICakeContext context,
-      string slnFilePath,
-      Action<IProjectConfiguration> setupProjConfig = null)
+    public static IProjectConfiguration AddDotNetCoreProject(this ICakeContext context, string slnFile, Action<IProjectConfiguration> projConfig = null)
     {
       if (context == null)
         throw new ArgumentNullException(nameof(context));
 
-      var helper = SingletonFactory.GetDotNetCoreHelper();
-      return helper.AddProjectConfiguration(slnFilePath, setupProjConfig);
-    }
+      if (string.IsNullOrWhiteSpace(slnFile))
+        throw new ArgumentNullException(nameof(slnFile));
 
-    [CakeMethodAlias]
-    public static void AddDotNetCoreHelperTestProjectFilters(this ICakeContext context, string filter)
-    {
-      if (context == null)
-        throw new ArgumentNullException(nameof(context));
+      var settings = SingletonFactory.GetHelperSettings().DotNetCoreSettings;
+      var proj = settings.AddProject(slnFile, projConfig);
 
-      if (string.IsNullOrWhiteSpace(filter))
-        return;
-
-      DotNetCoreSettingsCache.TestProjectNameFilters.Add(filter);
-    }
-
-    [CakePropertyAlias]
-    public static DotNetCoreHelper DotNetCoreHelper(this ICakeContext context)
-    {
-      if (context == null)
-        throw new ArgumentNullException(nameof(context));
-
-      SingletonFactory.Context = context;
-      return SingletonFactory.GetDotNetCoreHelper();
-    }
-
-    [CakePropertyAlias]
-    public static DirectoryPath DotNetCoreHelperBuildOutputFolder(this ICakeContext context)
-    {
-      if (context == null)
-        throw new ArgumentNullException(nameof(context));
-
-      return context.Directory(DotNetCoreSettingsCache.BuildTempFolder);
-    }
-
-    [CakePropertyAlias]
-    public static List<string> DotNetCoreHelperNugetSources(this ICakeContext context)
-    {
-      if (context == null)
-        throw new ArgumentNullException(nameof(context));
-
-      return DotNetCoreSettingsCache.NugetSources;
-    }
-
-    [CakePropertyAlias]
-    public static DirectoryPath DotNetCoreHelperTestOutputFolder(this ICakeContext context)
-    {
-      if (context == null)
-        throw new ArgumentNullException(nameof(context));
-
-      return context.Directory(DotNetCoreSettingsCache.TestTempFolder);
-    }
-
-    [CakePropertyAlias]
-    public static List<string> DotNetCoreHelperTestProjectFilters(this ICakeContext context)
-    {
-      if (context == null)
-        throw new ArgumentNullException(nameof(context));
-
-      return DotNetCoreSettingsCache.TestProjectNameFilters;
-    }
-
-    [CakeMethodAlias]
-    public static void SetDotNetCoreHelperBuildOutputFolder(this ICakeContext context, string outputFolder)
-    {
-      if (context == null)
-        throw new ArgumentNullException(nameof(context));
-
-      DotNetCoreSettingsCache.BuildTempFolder = outputFolder;
-    }
-
-    [CakeMethodAlias]
-    public static void SetDotNetCoreHelperTestOutputFolder(this ICakeContext context, string outputFolder)
-    {
-      if (context == null)
-        throw new ArgumentNullException(nameof(context));
-
-      DotNetCoreSettingsCache.TestTempFolder = outputFolder;
+      return proj;
     }
 
     #endregion
