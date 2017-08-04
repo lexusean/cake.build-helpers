@@ -78,7 +78,6 @@ namespace Cake.Helpers.Tests.Unit.Test
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void TestCleanTask_EmptyParentTaskName()
     {
       var testCategory = "Test";
@@ -90,12 +89,11 @@ namespace Cake.Helpers.Tests.Unit.Test
 
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
       var settings = this.GetSettings(context);
-      var cleanTask = context.TestCleanTask(taskName, testType, false, string.Empty);
+      Assert.ThrowsException<ArgumentNullException>(() => context.TestCleanTask(taskName, testType, false, string.Empty));
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void TestCleanTask_EmptyTargetName()
     {
       var testCategory = "Test";
@@ -106,12 +104,11 @@ namespace Cake.Helpers.Tests.Unit.Test
 
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
       var settings = this.GetSettings(context);
-      var cleanTask = context.TestCleanTask(string.Empty, testType);
+      Assert.ThrowsException<ArgumentNullException>(() => context.TestCleanTask(string.Empty, testType));
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void TestCleanTask_EmptyTestCategory()
     {
       var testCategory = "Test";
@@ -123,12 +120,11 @@ namespace Cake.Helpers.Tests.Unit.Test
 
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
       var settings = this.GetSettings(context);
-      var cleanTask = context.TestCleanTask(taskName, string.Empty);
+      Assert.ThrowsException<ArgumentNullException>(() => context.TestCleanTask(taskName, string.Empty));
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void TestCleanTask_NoContext()
     {
       var testCategory = "Test";
@@ -139,7 +135,7 @@ namespace Cake.Helpers.Tests.Unit.Test
       var taskName = "TestClean";
 
       ICakeContext context = null;
-      var cleanTask = context.TestCleanTask(taskName, testCategory);
+      Assert.ThrowsException<ArgumentNullException>(() => context.TestCleanTask(taskName, testCategory));
     }
 
     [TestMethod]
@@ -245,7 +241,6 @@ namespace Cake.Helpers.Tests.Unit.Test
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void TestTask_EmptyParentTaskName()
     {
       var testCategory = "Test";
@@ -257,12 +252,11 @@ namespace Cake.Helpers.Tests.Unit.Test
 
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
       var settings = this.GetSettings(context);
-      var cleanTask = context.TestTask(taskName, testType, false, string.Empty);
+      Assert.ThrowsException<ArgumentNullException>(() => context.TestTask(taskName, testType, false, string.Empty));
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void TestTask_EmptyTargetName()
     {
       var testCategory = "Test";
@@ -273,12 +267,11 @@ namespace Cake.Helpers.Tests.Unit.Test
 
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
       var settings = this.GetSettings(context);
-      var cleanTask = context.TestTask(string.Empty, testType);
+      Assert.ThrowsException<ArgumentNullException>(() => context.TestTask(string.Empty, testType));
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void TestTask_EmptyTestCategory()
     {
       var testCategory = "Test";
@@ -290,12 +283,11 @@ namespace Cake.Helpers.Tests.Unit.Test
 
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
       var settings = this.GetSettings(context);
-      var cleanTask = context.TestTask(taskName, string.Empty);
+      Assert.ThrowsException<ArgumentNullException>(() => context.TestTask(taskName, string.Empty));
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void TestTask_NoContext()
     {
       var testCategory = "Test";
@@ -306,7 +298,7 @@ namespace Cake.Helpers.Tests.Unit.Test
       var taskName = "TestClean";
 
       ICakeContext context = null;
-      var cleanTask = context.TestTask(testType, taskName);
+      Assert.ThrowsException<ArgumentNullException>(() => context.TestTask(testType, taskName));
     }
 
     [TestMethod]

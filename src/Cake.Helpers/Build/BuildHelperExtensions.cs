@@ -44,7 +44,7 @@ namespace Cake.Helpers.Build
       var parentTask = isTarget ? helper.GetBuildTask() : helper.AddToBuildTask(parentTaskName);
       var newTask = helper.GetBuildTask(newTaskName, isTarget);
 
-      parentTask.GetBuildTask()
+      parentTask.GetTaskBuilder()
         .IsDependentOn(newTask.TaskName);
 
       return newTask;
@@ -66,7 +66,7 @@ namespace Cake.Helpers.Build
       var parentTask = isTarget ? helper.GetPostBuildTask() : helper.AddToPostBuildTask(parentTaskName);
       var newTask = helper.GetPostBuildTask(newTaskName, isTarget);
 
-      parentTask.GetBuildTask()
+      parentTask.GetTaskBuilder()
         .IsDependentOn(newTask.TaskName);
 
       return newTask;
@@ -88,7 +88,7 @@ namespace Cake.Helpers.Build
       var parentTask = isTarget ? helper.GetPreBuildTask() : helper.AddToPreBuildTask(parentTaskName);
       var newTask = helper.GetPreBuildTask(newTaskName, isTarget);
 
-      parentTask.GetBuildTask()
+      parentTask.GetTaskBuilder()
         .IsDependentOn(newTask.TaskName);
 
       return newTask;

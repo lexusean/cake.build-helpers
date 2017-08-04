@@ -80,7 +80,6 @@ namespace Cake.Helpers.Tests.Unit.Build
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void BuildCleanTask_EmptyParentTaskName()
     {
       var cleanCategory = "Build";
@@ -91,12 +90,11 @@ namespace Cake.Helpers.Tests.Unit.Build
 
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
       var settings = this.GetSettings(context);
-      var cleanTask = context.BuildCleanTask(taskName, false, string.Empty);
+      Assert.ThrowsException<ArgumentNullException>(() => context.BuildCleanTask(taskName, false, string.Empty));
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void BuildCleanTask_EmptyTargetName()
     {
       var cleanCategory = "Build";
@@ -106,12 +104,11 @@ namespace Cake.Helpers.Tests.Unit.Build
 
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
       var settings = this.GetSettings(context);
-      var cleanTask = context.BuildCleanTask(string.Empty);
+      Assert.ThrowsException<ArgumentNullException>(() => context.BuildCleanTask(string.Empty));
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void BuildCleanTask_NoContext()
     {
       var cleanCategory = "Build";
@@ -121,7 +118,7 @@ namespace Cake.Helpers.Tests.Unit.Build
       var taskName = "BuildClean";
 
       ICakeContext context = null;
-      var cleanTask = context.BuildCleanTask(taskName);
+      Assert.ThrowsException<ArgumentNullException>(() => context.BuildCleanTask(taskName));
     }
 
     [TestMethod]
@@ -222,7 +219,6 @@ namespace Cake.Helpers.Tests.Unit.Build
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void PreBuildTask_EmptyParentTaskName()
     {
       var category = "PreBuild";
@@ -232,12 +228,11 @@ namespace Cake.Helpers.Tests.Unit.Build
 
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
       var settings = this.GetSettings(context);
-      var cleanTask = context.PreBuildTask(taskName, false, string.Empty);
+      Assert.ThrowsException<ArgumentNullException>(() => context.PreBuildTask(taskName, false, string.Empty));
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void PreBuildTask_EmptyTargetName()
     {
       var category = "PreBuild";
@@ -246,12 +241,11 @@ namespace Cake.Helpers.Tests.Unit.Build
 
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
       var settings = this.GetSettings(context);
-      var cleanTask = context.PreBuildTask(string.Empty);
+      Assert.ThrowsException<ArgumentNullException>(() => context.PreBuildTask(string.Empty));
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void PreBuildTask_NoContext()
     {
       var category = "PreBuild";
@@ -260,7 +254,7 @@ namespace Cake.Helpers.Tests.Unit.Build
       var taskName = "PreBuild";
 
       ICakeContext context = null;
-      var cleanTask = context.PreBuildTask(taskName);
+      Assert.ThrowsException<ArgumentNullException>(() => context.PreBuildTask(taskName));
     }
 
     [TestMethod]
@@ -363,7 +357,6 @@ namespace Cake.Helpers.Tests.Unit.Build
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void BuildTask_EmptyParentTaskName()
     {
       var category = "Build";
@@ -373,12 +366,11 @@ namespace Cake.Helpers.Tests.Unit.Build
 
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
       var settings = this.GetSettings(context);
-      var cleanTask = context.BuildTask(taskName, false, string.Empty);
+      Assert.ThrowsException<ArgumentNullException>(() => context.BuildTask(taskName, false, string.Empty));
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void BuildTask_EmptyTargetName()
     {
       var category = "Build";
@@ -387,12 +379,11 @@ namespace Cake.Helpers.Tests.Unit.Build
 
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
       var settings = this.GetSettings(context);
-      var cleanTask = context.BuildTask(string.Empty);
+      Assert.ThrowsException<ArgumentNullException>(() => context.BuildTask(string.Empty));
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void BuildTask_NoContext()
     {
       var category = "Build";
@@ -401,7 +392,7 @@ namespace Cake.Helpers.Tests.Unit.Build
       var taskName = "PreBuild";
 
       ICakeContext context = null;
-      var cleanTask = context.BuildTask(taskName);
+      Assert.ThrowsException<ArgumentNullException>(() => context.BuildTask(taskName));
     }
 
     [TestMethod]
@@ -505,7 +496,6 @@ namespace Cake.Helpers.Tests.Unit.Build
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void PostBuildTask_EmptyParentTaskName()
     {
       var category = "Build";
@@ -515,12 +505,11 @@ namespace Cake.Helpers.Tests.Unit.Build
 
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
       var settings = this.GetSettings(context);
-      var cleanTask = context.PostBuildTask(taskName, false, string.Empty);
+      Assert.ThrowsException<ArgumentNullException>(() => context.PostBuildTask(taskName, false, string.Empty));
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void PostBuildTask_EmptyTargetName()
     {
       var category = "Build";
@@ -529,12 +518,11 @@ namespace Cake.Helpers.Tests.Unit.Build
 
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
       var settings = this.GetSettings(context);
-      var cleanTask = context.PostBuildTask(string.Empty);
+      Assert.ThrowsException<ArgumentNullException>(() => context.PostBuildTask(string.Empty));
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void PostBuildTask_NoContext()
     {
       var category = "Build";
@@ -543,7 +531,7 @@ namespace Cake.Helpers.Tests.Unit.Build
       var taskName = "PreBuild";
 
       ICakeContext context = null;
-      var cleanTask = context.PostBuildTask(taskName);
+      Assert.ThrowsException<ArgumentNullException>(() => context.PostBuildTask(taskName));
     }
 
     [TestMethod]

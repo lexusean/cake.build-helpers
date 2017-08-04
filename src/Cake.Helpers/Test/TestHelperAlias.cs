@@ -24,7 +24,7 @@ namespace Cake.Helpers.Test
 
       return context.TaskHelper()
         .AddToTestCleanTask(taskName, testCategory, isTarget, parentTaskName)
-        .GetBuildTask();
+        .GetTaskBuilder();
     }
 
     [CakeMethodAlias]
@@ -40,7 +40,7 @@ namespace Cake.Helpers.Test
 
       return context.TaskHelper()
         .AddToTestTask(taskName, testCategory, isTarget, parentTaskName)
-        .GetBuildTask();
+        .GetTaskBuilder();
     }
 
     #endregion

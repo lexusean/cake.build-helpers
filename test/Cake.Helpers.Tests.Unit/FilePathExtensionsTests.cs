@@ -40,7 +40,6 @@ namespace Cake.Helpers.Tests.Unit
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void FilePath_MakeRelative_NoContext()
     {
       ICakeContext context = null;
@@ -48,16 +47,15 @@ namespace Cake.Helpers.Tests.Unit
 
       Assert.IsNotNull(filePath);
 
-      var relativeFilePath = context.MakeRelative(filePath);
+      Assert.ThrowsException<ArgumentNullException>(() => context.MakeRelative(filePath));
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void FilePath_MakeRelative_NoFile()
     {
       ICakeContext context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>()); ;
-      var relativeFilePath = context.MakeRelative(null);
+      Assert.ThrowsException<ArgumentNullException>(() => context.MakeRelative(null));
     }
 
     #endregion

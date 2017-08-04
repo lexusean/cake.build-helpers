@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Cake.Core;
 using Cake.Core.IO;
+using Cake.Helpers.Nuget;
+using Cake.Helpers.Settings;
 using Cake.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Cake.Helpers.Tests.Unit
+namespace Cake.Helpers.Tests.Unit.Nuget
 {
   [TestClass]
-  public class SingletonFactoryTests
+  public class NugetHelperSettingsTests
   {
     #region Test Setup and Teardown
 
@@ -26,116 +28,89 @@ namespace Cake.Helpers.Tests.Unit
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    public void SingletonFactoryClear_Success()
+    public void NugetHelperSettings_AddSource_ExistingFeed()
     {
+      var feedName = "testfeed";
+      var feedUrl = "testfeed";
+      var user = "test";
+      var pass = "pass";
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
-      SingletonFactory.Context = context;
+      var helperSetting = new NugetHelperSettings();
 
-      var settings = SingletonFactory.GetHelperSettings();
-      Assert.IsNotNull(settings);
+      var firstSource = helperSetting.AddSource(feedName, feedUrl);
 
-      SingletonFactory.ClearFactory();
-      Assert.IsNull(SingletonFactory.Context);
+      Assert.IsNotNull(firstSource);
+      Assert.IsFalse(firstSource.IsSecure);
 
-      SingletonFactory.Context = context;
-      var newSettings = SingletonFactory.GetHelperSettings();
+      var nextSource = helperSetting.AddSource(feedName, feedUrl, source =>
+      {
+        source.IsSecure = true;
+        source.Username = user;
+        source.Password = pass;
+      });
 
-      Assert.IsNotNull(newSettings);
-      Assert.AreNotEqual(settings, newSettings);
+      Assert.IsNotNull(nextSource);
+      Assert.AreEqual(firstSource, nextSource);
+      Assert.IsTrue(nextSource.IsSecure);
+      Assert.AreEqual(feedName, nextSource.FeedName);
+      Assert.AreEqual(feedUrl, nextSource.FeedSource);
+      Assert.AreEqual(user, nextSource.Username);
+      Assert.AreEqual(pass, nextSource.Password);
+
+      var feedUrls = helperSetting.GetFeedUrls();
+      Assert.IsNotNull(feedUrls);
+      var enumerable = feedUrls as string[] ?? feedUrls.ToArray();
+      Assert.AreEqual(2, enumerable.Count());
+      Assert.IsTrue(enumerable.Any(t => t == feedUrl));
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    public void GetHelperSettings_Success()
+    public void NugetHelperSettings_AddSource_FeedUrlOnly()
     {
+      var feedUrl = "testfeed";
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
-      SingletonFactory.Context = context;
+      var helperSetting = new NugetHelperSettings();
 
-      var settings = SingletonFactory.GetHelperSettings();
+      var firstSource = helperSetting.AddSource(feedUrl);
 
-      Assert.IsNotNull(settings);
-      Assert.IsNotNull(settings.Context);
-      Assert.IsFalse(settings.RunAllDependencies);
-
-      Assert.IsNotNull(settings.DotNetCoreSettings);
-
-      Assert.IsNotNull(settings.DotNetCoreSettings.NugetSettings);
-      Assert.IsNotNull(settings.DotNetCoreSettings.NugetSettings.Context);
-      Assert.AreEqual(1, settings.DotNetCoreSettings.NugetSettings.NugetSources.Count());
-
-      Assert.IsNotNull(settings.DotNetCoreSettings.BuildSettings);
-      Assert.AreEqual("./BuildTemp", settings.DotNetCoreSettings.BuildSettings.BuildTempFolder);
-
-      Assert.IsNotNull(settings.DotNetCoreSettings.TestSettings);
-      Assert.AreEqual("./TestTemp", settings.DotNetCoreSettings.TestSettings.TestTempFolder);
-
-      var newSettings = SingletonFactory.GetHelperSettings();
-      Assert.AreEqual(settings, newSettings);
+      Assert.IsNotNull(firstSource);
+      Assert.IsFalse(firstSource.IsSecure);
+      Assert.IsTrue(string.IsNullOrWhiteSpace(firstSource.FeedName));
+      Assert.AreEqual(feedUrl, firstSource.FeedSource);
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    public void GetCommandHelper_NoContext()
+    public void NugetHelperSettings_AddSource_NoFeedUrl()
     {
-      Assert.ThrowsException<ArgumentNullException>(() => SingletonFactory.GetCommandHelper());
-    }
+      var feedName = "testfeed";
 
-    [TestMethod]
-    [TestCategory(Global.TestType)]
-    public void GetCommandHelper_Success()
-    {
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
-      SingletonFactory.Context = context;
-
-      var helper = SingletonFactory.GetCommandHelper();
-
-      Assert.IsNotNull(helper);
-      Assert.IsNotNull(helper.Context);
-      Assert.AreEqual(context, helper.Context);
-
-      var newHelper = SingletonFactory.GetCommandHelper();
-      Assert.AreEqual(helper, newHelper);
+      var helperSetting = new NugetHelperSettings();
+      Assert.ThrowsException<ArgumentNullException>(() => helperSetting.AddSource(feedName, string.Empty));
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    public void GetDotNetCoreHelper_Success()
+    public void NugetHelperSettings_Default()
     {
+      var feedName = NugetHelperSettings.DefaultNugetFeedName;
+      var feedUrl = NugetHelperSettings.DefaultNugetFeedUrl;
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
-      SingletonFactory.Context = context;
+      var helperSetting = new NugetHelperSettings();
 
-      var helper = SingletonFactory.GetDotNetCoreHelper();
-
-      Assert.IsNotNull(helper);
-      Assert.IsNotNull(helper.Context);
-      Assert.AreEqual(context, helper.Context);
-
-      var newHelper = SingletonFactory.GetDotNetCoreHelper();
-      Assert.AreEqual(helper, newHelper);
+      Assert.IsNotNull(helperSetting.NugetSources);
+      Assert.AreEqual(1, helperSetting.NugetSources.Count());
+      Assert.IsTrue(helperSetting.NugetSources.All(t => t.FeedName == feedName && t.FeedSource == feedUrl));
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    public void GetTaskHelper_NoContext()
+    public void NugetHelperSettings_GetFeedUrls_NullHelper()
     {
-      Assert.ThrowsException<ArgumentNullException>(() => SingletonFactory.GetTaskHelper());
-    }
-
-    [TestMethod]
-    [TestCategory(Global.TestType)]
-    public void GetTaskHelper_Success()
-    {
-      var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
-      SingletonFactory.Context = context;
-
-      var taskHelper = SingletonFactory.GetTaskHelper();
-
-      Assert.IsNotNull(taskHelper);
-      Assert.IsNotNull(taskHelper.Context);
-      Assert.AreEqual(context, taskHelper.Context);
-
-      var newHelper = SingletonFactory.GetTaskHelper();
-      Assert.AreEqual(taskHelper, newHelper);
+      INugetHelperSettings helperSetting = null;
+      Assert.ThrowsException<ArgumentNullException>(() => helperSetting.GetFeedUrls());
     }
 
     #endregion

@@ -168,7 +168,6 @@ namespace Cake.Helpers.Tests.Unit.Clean
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void CleanTask_NoContext()
     {
       var cleanCategory = "Generic";
@@ -178,7 +177,7 @@ namespace Cake.Helpers.Tests.Unit.Clean
       var taskName = "TestClean";
 
       ICakeContext context = null;
-      var cleanTask = context.CleanTask(taskName);
+      Assert.ThrowsException<ArgumentNullException>(() => context.CleanTask(taskName));
     }
 
     #endregion

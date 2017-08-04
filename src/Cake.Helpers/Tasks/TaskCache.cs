@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,8 +12,8 @@ namespace Cake.Helpers.Tasks
 {
   public class HelperTask : IHelperTask
   {
-    protected const string DefaultTaskCategory = "Generic";
-    protected const string DefaultTaskType = "Unknown";
+    internal const string DefaultTaskCategory = "Generic";
+    internal const string DefaultTaskType = "Unknown";
 
     private string _Category = DefaultTaskCategory;
     /// <inheritdoc />
@@ -65,6 +66,7 @@ namespace Cake.Helpers.Tasks
     }
   }
 
+  [ExcludeFromCodeCoverage]
   public class TaskCache : IDictionary<string, IHelperTask>
   {
     #region Private Fields

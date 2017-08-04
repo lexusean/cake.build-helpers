@@ -38,7 +38,7 @@ namespace Cake.Helpers.Test
         : helper.AddToTestCleanTask(parentTaskName, testCategory);
       var newTask = helper.GetTestCleanTask(testCategory, newTaskName, isTarget);
 
-      parentTask.GetBuildTask()
+      parentTask.GetTaskBuilder()
         .IsDependentOn(newTask.TaskName);
 
       return newTask;
@@ -66,7 +66,7 @@ namespace Cake.Helpers.Test
         : helper.AddToTestTask(parentTaskName, testCategory);
       var newTask = helper.GetTestTask(testCategory, newTaskName, isTarget);
 
-      parentTask.GetBuildTask()
+      parentTask.GetTaskBuilder()
         .IsDependentOn(newTask.TaskName);
 
       return newTask;

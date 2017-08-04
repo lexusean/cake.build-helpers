@@ -1,16 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cake.Common.IO;
 using Cake.Core;
 using Cake.Core.IO;
+using Cake.Helpers.DotNetCore;
+using Cake.Helpers.Nuget;
+using Cake.Helpers.Settings;
 using Cake.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Cake.Helpers.Tests.Unit
+namespace Cake.Helpers.Tests.Unit.Settings
 {
   [TestClass]
-  public class HelperAliasTests
+  public class HelperSettingsTests
   {
     #region Test Setup and Teardown
 
@@ -26,25 +30,75 @@ namespace Cake.Helpers.Tests.Unit
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    public void HelperSettingsAlias_Success()
-    {
+    public void HelperSettings_Setup_Success()
+    { 
       var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
-      var settings = context.HelperSettings();
+      SingletonFactory.Context = context;
 
-      Assert.IsNotNull(settings);
-      Assert.IsNotNull(settings.Context);
+      var dotNetCoreHelper = SingletonFactory.GetDotNetCoreHelper();
+      Assert.IsNotNull(dotNetCoreHelper);
+      var coreHelperType = dotNetCoreHelper.GetType();
+      Assert.IsTrue(SingletonFactory.ExistsInCache(coreHelperType));
 
-      var newSettings = context.HelperSettings();
-      Assert.AreEqual(settings, newSettings);
+      SingletonFactory.ClearFactory();
+      SingletonFactory.Context = context;
+      Assert.IsFalse(SingletonFactory.ExistsInCache(coreHelperType));
+
+      var helperSetting = new HelperSettings();
+      ((DotNetCoreHelperSettings)helperSetting.DotNetCoreSettings).IsActive = true;
+
+      helperSetting.SetupSetting();
+      Assert.IsTrue(SingletonFactory.ExistsInCache(coreHelperType));
+
+      var newDotNetCoreHelper = SingletonFactory.GetDotNetCoreHelper();
+
+      Assert.IsNotNull(newDotNetCoreHelper);
+      Assert.AreNotEqual(dotNetCoreHelper, newDotNetCoreHelper);
     }
 
     [TestMethod]
     [TestCategory(Global.TestType)]
-    public void HelperSettingsAlias_NoContext()
+    public void HelperSettings_Setup_NoActive()
     {
-      ICakeContext context = null;
+      var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
+      SingletonFactory.Context = context;
 
-      Assert.ThrowsException<ArgumentNullException>(() => context.HelperSettings());
+      var dotNetCoreHelper = SingletonFactory.GetDotNetCoreHelper();
+      Assert.IsNotNull(dotNetCoreHelper);
+      var coreHelperType = dotNetCoreHelper.GetType();
+      Assert.IsTrue(SingletonFactory.ExistsInCache(coreHelperType));
+
+      SingletonFactory.ClearFactory();
+      SingletonFactory.Context = context;
+      Assert.IsFalse(SingletonFactory.ExistsInCache(coreHelperType));
+
+      var helperSetting = new HelperSettings();
+      ((DotNetCoreHelperSettings)helperSetting.DotNetCoreSettings).IsActive = false;
+
+      helperSetting.SetupSetting();
+      Assert.IsFalse(SingletonFactory.ExistsInCache(coreHelperType));
+    }
+
+    [TestMethod]
+    [TestCategory(Global.TestType)]
+    public void HelperSettings_SetRunTarget()
+    {
+      var context = this.GetMoqContext(new Dictionary<string, bool>(), new Dictionary<string, string>());
+      SingletonFactory.Context = context;
+
+      bool runTargetRan = false;
+      var helperSetting = new HelperSettings();
+      helperSetting.RunTargetFunc = target =>
+      {
+        runTargetRan = true;
+        return new CakeReport();
+      };
+
+      Assert.IsNotNull(helperSetting.RunTargetFunc);
+      Assert.IsFalse(runTargetRan);
+
+      helperSetting.RunTargetFunc(string.Empty);
+      Assert.IsTrue(runTargetRan);
     }
 
     #endregion

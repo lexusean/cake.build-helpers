@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Cake.Common.IO;
@@ -44,6 +45,7 @@ namespace Cake.Helpers.DotNetCore
 
     #region Ctor
 
+    [ExcludeFromCodeCoverage]
     internal ProjectConfiguration(ICakeContext context)
     {
       if (context == null)

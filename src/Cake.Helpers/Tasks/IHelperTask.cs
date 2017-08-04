@@ -18,8 +18,8 @@ namespace Cake.Helpers.Tasks
 
   public interface IHelperRunTarget
   {
-    void RunTarget(IHelperTask task);
-    void RunTarget(string targetName);
+    CakeReport RunTarget(IHelperTask task);
+    CakeReport RunTarget(string targetName);
   }
 
   public interface IHelperTaskHandler : IHelper

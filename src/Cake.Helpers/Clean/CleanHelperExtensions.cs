@@ -73,7 +73,7 @@ namespace Cake.Helpers.Clean
       var newTask = helper.GetCleanTask(cleanCategory, newTaskName, isTarget);
 
       parentTask
-        .GetBuildTask()
+        .GetTaskBuilder()
         .IsDependentOn(newTask.TaskName);
 
       return newTask;

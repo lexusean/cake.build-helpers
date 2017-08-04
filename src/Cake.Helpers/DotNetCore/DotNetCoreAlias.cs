@@ -21,6 +21,7 @@ namespace Cake.Helpers.DotNetCore
       if (context == null)
         throw new ArgumentNullException(nameof(context));
 
+      SingletonFactory.Context = context;
       return SingletonFactory.GetHelperSettings().DotNetCoreSettings;
     }
 
@@ -30,6 +31,7 @@ namespace Cake.Helpers.DotNetCore
       if (context == null)
         throw new ArgumentNullException(nameof(context));
 
+      SingletonFactory.Context = context;
       return SingletonFactory.GetHelperSettings().DotNetCoreSettings.BuildSettings;
     }
 
@@ -39,6 +41,7 @@ namespace Cake.Helpers.DotNetCore
       if (context == null)
         throw new ArgumentNullException(nameof(context));
 
+      SingletonFactory.Context = context;
       return SingletonFactory.GetHelperSettings().DotNetCoreSettings.TestSettings;
     }
 
@@ -49,9 +52,9 @@ namespace Cake.Helpers.DotNetCore
         throw new ArgumentNullException(nameof(context));
 
       if (string.IsNullOrWhiteSpace(feedSource))
-        return;
+        throw new ArgumentNullException(nameof(feedSource));
 
-      var settings = SingletonFactory.GetHelperSettings().DotNetCoreSettings.NugetSettings;
+      var settings = context.DotNetCoreHelperSettings().NugetSettings;
       var source = settings.AddSource(feedSource);
       sourceConfig?.Invoke(source);
     }
@@ -62,10 +65,7 @@ namespace Cake.Helpers.DotNetCore
       if (context == null)
         throw new ArgumentNullException(nameof(context));
 
-      if (string.IsNullOrWhiteSpace(slnFile))
-        throw new ArgumentNullException(nameof(slnFile));
-
-      var settings = SingletonFactory.GetHelperSettings().DotNetCoreSettings;
+      var settings = context.DotNetCoreHelperSettings();
       var proj = settings.AddProject(slnFile, projConfig);
 
       return proj;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Cake.Core;
 using Cake.Helpers.Settings;
@@ -8,6 +9,9 @@ namespace Cake.Helpers.Nuget
 {
   internal class NugetHelperSettings : INugetHelperSettings, ISubSetting
   {
+    internal const string DefaultNugetFeedName = "NugetV3";
+    internal const string DefaultNugetFeedUrl = "https://api.nuget.org/v3/index.json";
+
     #region Private Fields
 
     private readonly List<INugetSource> _NugetSources = new List<INugetSource>();
@@ -18,7 +22,7 @@ namespace Cake.Helpers.Nuget
 
     internal NugetHelperSettings()
     {
-      this.AddSource("NugetV3", "https://api.nuget.org/v3/index.json");
+      this.AddSource(DefaultNugetFeedName, DefaultNugetFeedUrl);
     }
 
     #endregion
@@ -65,14 +69,24 @@ namespace Cake.Helpers.Nuget
 
     #endregion
 
-    #region ISubSetting Members
+    #region ISetting Members
 
-    public bool IsActive { get; internal set; }
+    [ExcludeFromCodeCoverage]
+    public void SetupSetting()
+    { }
 
     #endregion
 
-    public void SetupSetting()
+    #region ISubSetting Members
+
+    public bool IsActive
     {
+      [ExcludeFromCodeCoverage]
+      get;
+      [ExcludeFromCodeCoverage]
+      internal set;
     }
+
+    #endregion
   }
 }

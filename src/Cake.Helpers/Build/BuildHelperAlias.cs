@@ -26,7 +26,7 @@ namespace Cake.Helpers.Build
 
       return context.TaskHelper()
         .AddToBuildCleanTask(taskName, isTarget, parentTaskName)
-        .GetBuildTask();
+        .GetTaskBuilder();
     }
 
     [CakeMethodAlias]
@@ -41,7 +41,7 @@ namespace Cake.Helpers.Build
 
       return context.TaskHelper()
         .AddToPreBuildTask(taskName, isTarget, parentTaskName)
-        .GetBuildTask();
+        .GetTaskBuilder();
     }
 
     [CakeMethodAlias]
@@ -56,7 +56,7 @@ namespace Cake.Helpers.Build
 
       return context.TaskHelper()
         .AddToBuildTask(taskName, isTarget, parentTaskName)
-        .GetBuildTask();
+        .GetTaskBuilder();
     }
 
     [CakeMethodAlias]
@@ -71,7 +71,7 @@ namespace Cake.Helpers.Build
 
       return context.TaskHelper()
         .AddToPostBuildTask(taskName, isTarget, parentTaskName)
-        .GetBuildTask();
+        .GetTaskBuilder();
     }
   }
 }

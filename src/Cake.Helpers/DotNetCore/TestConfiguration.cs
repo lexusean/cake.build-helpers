@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Cake.Core;
 
 namespace Cake.Helpers.DotNetCore
@@ -29,6 +30,7 @@ namespace Cake.Helpers.DotNetCore
 
     #region Ctor
 
+    [ExcludeFromCodeCoverage]
     internal TestConfiguration(ICakeContext context, string testCategory)
     {
       if (context == null)
@@ -53,6 +55,7 @@ namespace Cake.Helpers.DotNetCore
     public string TestCategory
     {
       get { return this._TestCategory; }
+      [ExcludeFromCodeCoverage]
       set
       {
         if (string.IsNullOrWhiteSpace(value))

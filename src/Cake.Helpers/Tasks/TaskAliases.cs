@@ -35,7 +35,7 @@ namespace Cake.Helpers.Tasks
 
       return context.TaskHelper()
         .GetTask(taskName, isTarget, taskCategory, taskType)
-        .GetBuildTask();
+        .GetTaskBuilder();
     }
   }
 }

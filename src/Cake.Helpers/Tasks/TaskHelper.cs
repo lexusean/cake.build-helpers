@@ -41,18 +41,18 @@ namespace Cake.Helpers.Tasks
     #region IHelperRunTarget Members
 
     /// <inheritdoc />
-    public void RunTarget(IHelperTask task)
+    public CakeReport RunTarget(IHelperTask task)
     {
-      this.RunTarget(task.TaskName);
+      return this.RunTarget(task.TaskName);
     }
 
     /// <inheritdoc />
-    public void RunTarget(string targetName)
+    public CakeReport RunTarget(string targetName)
     {
       if (this._HelperSettings.RunTargetFunc == null)
         throw new ArgumentNullException(nameof(this._HelperSettings.RunTargetFunc));
 
-      this._HelperSettings.RunTargetFunc?.Invoke(targetName);
+      return this._HelperSettings.RunTargetFunc?.Invoke(targetName);
     }
 
     #endregion

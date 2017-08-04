@@ -15,7 +15,10 @@ namespace Cake.Helpers.Tasks
       string dependentTaskName)
     {
       if (task == null)
-        return;
+        throw new ArgumentNullException(nameof(task));
+
+      if(string.IsNullOrWhiteSpace(dependentTaskName))
+        throw new ArgumentNullException(nameof(dependentTaskName));
 
       if (task.Task.Dependencies.Any(t => t == dependentTaskName))
         return;
@@ -29,9 +32,9 @@ namespace Cake.Helpers.Tasks
       string dependentTaskName)
     {
       if (task == null)
-        return;
+        throw new ArgumentNullException(nameof(task));
 
-      helper.AddTaskDependency(new CakeTaskBuilder<ActionTask>(task.Task), dependentTaskName);
+      helper.AddTaskDependency(task.GetTaskBuilder(), dependentTaskName);
     }
 
     public static void AddTaskDependency(
@@ -45,7 +48,7 @@ namespace Cake.Helpers.Tasks
       helper.AddTaskDependency(task, dependentTask.TaskName);
     }
 
-    public static CakeTaskBuilder<ActionTask> GetBuildTask(this IHelperTask task)
+    public static CakeTaskBuilder<ActionTask> GetTaskBuilder(this IHelperTask task)
     {
       if (task == null)
         return null;
@@ -53,7 +56,7 @@ namespace Cake.Helpers.Tasks
       return new CakeTaskBuilder<ActionTask>(task.Task);
     }
 
-    public static IHelperTask GetBuildTask(
+    public static IHelperTask GetTargetTask(
       this IHelperTaskHandler helper,
       string taskName,
       string category = "",
@@ -73,17 +76,6 @@ namespace Cake.Helpers.Tasks
         return Enumerable.Empty<string>();
 
       return helper.Tasks.GetCategories();
-    }
-
-    public static string GetCategoryForTask(this IHelperTaskHandler helper, string taskName)
-    {
-      if (helper == null)
-        return string.Empty;
-
-      return helper.Tasks
-        .Where(t => t.Category == taskName)
-        .Select(t => t.Category)
-        .FirstOrDefault();
     }
 
     public static IEnumerable<IHelperTask> GetTargetTasks(this IEnumerable<IHelperTask> tasks)
@@ -108,7 +100,7 @@ namespace Cake.Helpers.Tasks
 
     public static IEnumerable<CakeTaskBuilder<ActionTask>> GetTaskBuilders(this IEnumerable<IHelperTask> tasks)
     {
-      return tasks.Select(task => task.GetBuildTask());
+      return tasks.Select(task => task.GetTaskBuilder());
     }
 
     #endregion

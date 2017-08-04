@@ -26,6 +26,11 @@ namespace Cake.Helpers
     private static readonly ConcurrentDictionary<Type, object> _SingletonCache =
       new ConcurrentDictionary<Type, object>();
 
+    internal static bool ExistsInCache(Type tt)
+    {
+      return _SingletonCache.ContainsKey(tt);
+    }
+
     public static ICommandHelper GetCommandHelper()
     {
       return GetInstance(() => new CommandHelper(GetTaskHelper()));

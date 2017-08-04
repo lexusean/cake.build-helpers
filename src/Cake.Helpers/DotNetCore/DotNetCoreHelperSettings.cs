@@ -40,8 +40,8 @@ namespace Cake.Helpers.DotNetCore
 
     public List<string> TestProjectNameFilters { get; } = new List<string>(new[]
     {
-      "*.Test.*",
-      "*.Tests.*"
+      ".+\\.Test\\..*",
+      ".+\\.Tests\\..*"
     });
 
     public string TestTempFolder { get; set; } = "./TestTemp";

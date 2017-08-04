@@ -26,7 +26,7 @@ namespace Cake.Helpers.Clean
 
       return context.TaskHelper()
         .AddToCleanTask(taskName, cleanCategory, isTarget, parentTaskName)
-        .GetBuildTask();
+        .GetTaskBuilder();
     }
   }
 }
