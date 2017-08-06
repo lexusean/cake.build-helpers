@@ -25,11 +25,9 @@ namespace Cake.Helpers.Tests.Unit.DotNetCore
         throw new ArgumentNullException(nameof(projFile));
 
       var fakeFs = fs as FakeFileSystem;
-      if (fakeFs == null)
-        throw new ArgumentNullException(nameof(fs));
 
       this.ProjectFilePath = projFile;
-      this.FakeFs = fakeFs;
+      this.FakeFs = fakeFs ?? throw new ArgumentNullException(nameof(fs));
     }
 
     public FakeFile SetContents(string contents)
@@ -50,6 +48,7 @@ namespace Cake.Helpers.Tests.Unit.DotNetCore
       sln.SetContents(Properties.Resources.DefaultSlnContent);
       sln.AddProject(Properties.Resources.DefaultProject1Location, Properties.Resources.DefaultProject1Content);
       sln.AddProject(Properties.Resources.DefaultProject2Location, Properties.Resources.DefaultProject2Content);
+      sln.FakeFs.CreateDirectory("./BuildTemp");
 
       return sln;
     }
@@ -67,11 +66,9 @@ namespace Cake.Helpers.Tests.Unit.DotNetCore
         throw new ArgumentNullException(nameof(slnFile));
 
       var fakeFs = fs as FakeFileSystem;
-      if (fakeFs == null)
-        throw new ArgumentNullException(nameof(fs));
 
       this.SlnFilePath = slnFile;
-      this.FakeFs = fakeFs;
+      this.FakeFs = fakeFs ?? throw new ArgumentNullException(nameof(fs));
     }
 
     public FakeFile SetContents(string contents)

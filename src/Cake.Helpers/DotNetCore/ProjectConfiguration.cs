@@ -177,8 +177,7 @@ namespace Cake.Helpers.DotNetCore
         throw new ArgumentNullException(nameof(testConfig));
 
       this._testConfigurations.Add(testConfig);
-      if (this.TestConfigAdded != null)
-        this.TestConfigAdded(this, testConfig);
+      this.TestConfigAdded?.Invoke(this, testConfig);
     }
 
     public event Action<IProjectConfiguration, ITestConfiguration> TestConfigAdded;
@@ -215,6 +214,7 @@ namespace Cake.Helpers.DotNetCore
       return paths;
     }
 
+    [ExcludeFromCodeCoverage]
     public static IEnumerable<string> GetProjectOutputDirectoryPaths(
       this SolutionProject project,
       IProjectConfiguration config)
@@ -258,6 +258,7 @@ namespace Cake.Helpers.DotNetCore
       return config.Context.MakeRelative(config.SlnFilePath);
     }
 
+    [ExcludeFromCodeCoverage]
     public static IEnumerable<FilePath> GetSrcProjectArtifacts(
       this IProjectConfiguration config)
     {
@@ -277,6 +278,7 @@ namespace Cake.Helpers.DotNetCore
         .Where(t => config.Context.FileExists(t));
     }
 
+    [ExcludeFromCodeCoverage]
     private static string GetProjectBinOutputDirectoryPath(
       this SolutionProject project,
       IProjectConfiguration config)
@@ -299,6 +301,7 @@ namespace Cake.Helpers.DotNetCore
       return binPath;
     }
 
+    [ExcludeFromCodeCoverage]
     private static string GetProjectObjOutputDirectoryPath(
       this SolutionProject project,
       IProjectConfiguration config)

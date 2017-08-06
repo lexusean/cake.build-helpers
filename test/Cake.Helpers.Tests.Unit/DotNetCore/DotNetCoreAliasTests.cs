@@ -97,6 +97,10 @@ namespace Cake.Helpers.Tests.Unit.DotNetCore
       var helperSettings = SingletonFactory.GetHelperSettings();
       Assert.IsNotNull(helperSettings);
       Assert.AreEqual(helperSettings.DotNetCoreSettings.TestSettings, dotCoreSettings);
+
+      Assert.AreEqual("./TestTemp", dotCoreSettings.TestTempFolder);
+      dotCoreSettings.TestTempFolder = "AnotherTest";
+      Assert.AreEqual("AnotherTest", dotCoreSettings.TestTempFolder);
     }
 
     [TestMethod]
@@ -275,13 +279,26 @@ namespace Cake.Helpers.Tests.Unit.DotNetCore
         testAdded = testConfiguration.TestCategory;
       };
 
-      slnProj.AddTestConfig(systemTest);
+      var systemTestConfig = slnProj.AddTestConfig(systemTest);
       Assert.AreEqual(systemTest, testAdded);
       Assert.AreEqual(2, slnProj.TestConfigurations.Count());
+      Assert.AreEqual("TestCategory=System", systemTestConfig.GetDotNetCoreCategoryString());
+      systemTestConfig.TestType = TestTypeEnum.XUnit;
+      Assert.AreEqual("Category=System", systemTestConfig.GetDotNetCoreCategoryString());
+      Assert.ThrowsException<ArgumentNullException>(() => ((ITestConfiguration) null).GetDotNetCoreCategoryString());
 
       var sameProj = context.AddDotNetCoreProject(defaultSln.SlnFile.Path.FullPath);
       Assert.IsNotNull(sameProj);
       Assert.AreEqual(slnProj, sameProj);
+      var outputPaths = slnProj.GetAllProjectOutputDirectoryPaths().ToArray();
+      Assert.AreEqual(4, outputPaths.Length);
+
+      Assert.ThrowsException<ArgumentNullException>(() => sameProj.AddTestConfig((ITestConfiguration)null));
+      Assert.ThrowsException<ArgumentNullException>(() => ((IProjectConfiguration)null).AddTestConfig("test"));
+      Assert.ThrowsException<ArgumentNullException>(() => ((IProjectConfiguration) null)
+        .GetAllProjectOutputDirectoryPaths());
+      Assert.ThrowsException<ArgumentNullException>(() => ((IProjectConfiguration)null)
+        .GetRelativeSlnFilePath());
     }
 
     [TestMethod]

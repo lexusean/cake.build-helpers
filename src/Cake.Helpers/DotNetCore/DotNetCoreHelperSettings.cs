@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Cake.Common.IO;
@@ -19,17 +20,24 @@ namespace Cake.Helpers.DotNetCore
 
     #region IHelperContext Members
 
-    public ICakeContext Context { get; set; }
+    public ICakeContext Context { [ExcludeFromCodeCoverage]get; set; }
+
+    #endregion
+
+    #region ISetting Members
+
+    /// <inheritdoc />
+    [ExcludeFromCodeCoverage]
+    public void SetupSetting()
+    { }
 
     #endregion
 
     #region ISubSetting Members
 
+    /// <inheritdoc />
+    [ExcludeFromCodeCoverage]
     public bool IsActive { get; internal set; }
-
-    public void SetupSetting()
-    {
-    }
 
     #endregion
   }
@@ -50,17 +58,22 @@ namespace Cake.Helpers.DotNetCore
 
     #region IHelperContext Members
 
-    public ICakeContext Context { get; set; }
+    public ICakeContext Context { [ExcludeFromCodeCoverage]get; set; }
+
+    #endregion
+
+    #region ISetting Members
+
+    [ExcludeFromCodeCoverage]
+    public void SetupSetting()
+    { }
 
     #endregion
 
     #region ISubSetting Members
 
+    [ExcludeFromCodeCoverage]
     public bool IsActive { get; internal set; }
-
-    public void SetupSetting()
-    {
-    }
 
     #endregion
   }
@@ -135,6 +148,19 @@ namespace Cake.Helpers.DotNetCore
 
     #endregion
 
+    #region ISetting Members
+
+    public void SetupSetting()
+    {
+      var coreHelper = SingletonFactory.GetDotNetCoreHelper();
+      foreach (var projectConfig in this.Projects)
+      {
+        coreHelper.AddProjectConfiguration(projectConfig);
+      }
+    }
+
+    #endregion
+
     #region ISubSetting Members
 
     public bool IsActive
@@ -146,15 +172,6 @@ namespace Cake.Helpers.DotNetCore
         ((NugetHelperSettings) this.NugetSettings).IsActive = value;
         ((DotNetCoreBuildHelperSettings) this.BuildSettings).IsActive = value;
         ((DotNetCoreTestHelperSettings) this.TestSettings).IsActive = value;
-      }
-    }
-
-    public void SetupSetting()
-    {
-      var coreHelper = SingletonFactory.GetDotNetCoreHelper();
-      foreach (var projectConfig in this.Projects)
-      {
-        coreHelper.AddProjectConfiguration(projectConfig);
       }
     }
 

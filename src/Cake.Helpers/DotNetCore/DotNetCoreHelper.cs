@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using Cake.Common.Diagnostics;
 using Cake.Common.IO;
 using Cake.Common.Tools.DotNetCore;
@@ -34,7 +36,6 @@ namespace Cake.Helpers.DotNetCore
     private readonly IHelperSettings _helperSettings = SingletonFactory.GetHelperSettings();
 
     private readonly List<IProjectConfiguration> _projects = new List<IProjectConfiguration>();
-    private readonly List<ITestConfiguration> _Tests = new List<ITestConfiguration>();
 
     #endregion
 
@@ -47,6 +48,7 @@ namespace Cake.Helpers.DotNetCore
 
     #region Private Methods
 
+    [ExcludeFromCodeCoverage]
     private void RegisterBuildTasks(IProjectConfiguration projConfig)
     {
       this.Context.BuildTask(projConfig.ProjectAlias);
@@ -65,6 +67,7 @@ namespace Cake.Helpers.DotNetCore
         });
     }
 
+    [ExcludeFromCodeCoverage]
     private void RegisterCleanTasks(IProjectConfiguration projConfig)
     {
       this.Context.BuildCleanTask(projConfig.ProjectAlias);
@@ -104,6 +107,7 @@ namespace Cake.Helpers.DotNetCore
         });
     }
 
+    [ExcludeFromCodeCoverage]
     private void RegisterPostBuildTasks(IProjectConfiguration projConfig)
     {
       this.Context.PostBuildTask(projConfig.ProjectAlias);
@@ -129,6 +133,7 @@ namespace Cake.Helpers.DotNetCore
         });
     }
 
+    [ExcludeFromCodeCoverage]
     private void RegisterPreBuildTasks(IProjectConfiguration projConfig)
     {
       this.Context.PreBuildTask(projConfig.ProjectAlias);
@@ -145,6 +150,7 @@ namespace Cake.Helpers.DotNetCore
         });
     }
 
+    [ExcludeFromCodeCoverage]
     private void RegisterTestTasks(IProjectConfiguration projConfig, ITestConfiguration testConfig)
     {
       this.Context.TestCleanTask(projConfig.ProjectAlias, testConfig.TestCategory)
@@ -207,7 +213,7 @@ namespace Cake.Helpers.DotNetCore
 
     public IEnumerable<ITestConfiguration> Tests
     {
-      get { return this._Tests; }
+      get { return this.Projects.SelectMany(t => t.TestConfigurations).Distinct(); }
     }
 
     public DirectoryPath TestTempFolder
