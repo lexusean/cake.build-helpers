@@ -37,7 +37,7 @@ namespace Cake.Helpers.DotNetCore
 
     /// <inheritdoc />
     [ExcludeFromCodeCoverage]
-    public bool IsActive { get; internal set; }
+    public bool IsActive { [ExcludeFromCodeCoverage] get; [ExcludeFromCodeCoverage] internal set; }
 
     #endregion
   }
@@ -73,7 +73,7 @@ namespace Cake.Helpers.DotNetCore
     #region ISubSetting Members
 
     [ExcludeFromCodeCoverage]
-    public bool IsActive { get; internal set; }
+    public bool IsActive { [ExcludeFromCodeCoverage] get; [ExcludeFromCodeCoverage] internal set; }
 
     #endregion
   }
@@ -87,6 +87,7 @@ namespace Cake.Helpers.DotNetCore
     private bool _IsActive;
 
     private readonly List<IProjectConfiguration> _Projects = new List<IProjectConfiguration>();
+    private readonly List<IDocConfiguration> _Docs = new List<IDocConfiguration>();
 
     #endregion
 
@@ -128,6 +129,28 @@ namespace Cake.Helpers.DotNetCore
       projectConfig?.Invoke(existingProjectConfig);
 
       return existingProjectConfig;
+    }
+
+    public IEnumerable<IDocConfiguration> DocConfigs
+    {
+      get { return this._Docs; }
+    }
+
+    public IDocConfiguration AddDocConfiguration(IDocConfiguration docConfig)
+    {
+      if(docConfig == null)
+        throw new ArgumentNullException(nameof(docConfig));
+
+      var existingConfig =
+        this._Docs.FirstOrDefault(t => t.Name == docConfig.Name && t.GetType() == docConfig.GetType());
+      if (existingConfig == null)
+      {
+        docConfig.Context = this.Context;
+        this._Docs.Add(docConfig);
+        return docConfig;
+      }
+
+      return existingConfig;
     }
 
     #endregion

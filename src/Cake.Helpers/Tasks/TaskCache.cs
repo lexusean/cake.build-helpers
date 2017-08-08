@@ -10,7 +10,7 @@ using Cake.Core;
 
 namespace Cake.Helpers.Tasks
 {
-  public class HelperTask : IHelperTask
+  internal class HelperTask : IHelperTask
   {
     internal const string DefaultTaskCategory = "Generic";
     internal const string DefaultTaskType = "Unknown";
@@ -67,7 +67,7 @@ namespace Cake.Helpers.Tasks
   }
 
   [ExcludeFromCodeCoverage]
-  public class TaskCache : IDictionary<string, IHelperTask>
+  internal class TaskCache : IDictionary<string, IHelperTask>
   {
     #region Private Fields
 

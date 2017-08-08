@@ -11,23 +11,71 @@ using Cake.Helpers.Settings;
 
 namespace Cake.Helpers.DotNetCore
 {
+  /// <summary>
+  ///   DotNetCore Project Configuration Contract
+  /// </summary>
   public interface IProjectConfiguration : IHelperContext
   {
+    /// <summary>
+    ///   Project Name. This defaults to solution name with { " ", "." } trimmed
+    /// </summary>
     string ProjectAlias { get; set; }
+
+    /// <summary>
+    ///   Solution path
+    /// </summary>
     FilePath SlnFilePath { get; set; }
+
+    /// <summary>
+    ///   Configuration (Release, Debug, etc)
+    /// </summary>
     string Configuration { get; set; }
+
+    /// <summary>
+    ///   Framework (net452, netstandard1.6)
+    /// </summary>
     string Framework { get; set; }
+
+    /// <summary>
+    ///   Platform (x86, x64). Leave empty if AnyCpu
+    /// </summary>
     string Platform { get; set; }
 
+    /// <summary>
+    ///   PostBuild temporary directory for artifacts from build
+    /// </summary>
     DirectoryPath BuildTempDirectory { get; }
 
+    /// <summary>
+    ///   All .csproj defined in solution
+    /// </summary>
     IEnumerable<SolutionProject> AllProjects { get; }
+
+    /// <summary>
+    ///   All .csproj defined in solution that not marked as test projects
+    /// </summary>
     IEnumerable<SolutionProject> SrcProjects { get; }
+
+    /// <summary>
+    ///   All .csproj defined in solution that match test name filter DotNetCoreTestHelperSettings.TestProjectNameFilters
+    ///   default is any project with ".Test." or ".Tests." in name
+    /// </summary>
     IEnumerable<SolutionProject> TestProjects { get; }
 
+    /// <summary>
+    ///   Test configurations to run. This is what is set when you want to run different test categories
+    /// </summary>
     IEnumerable<ITestConfiguration> TestConfigurations { get; }
+
+    /// <summary>
+    ///   Adds a test configuration to the project
+    /// </summary>
+    /// <param name="testConfig"></param>
     void AddTestConfig(ITestConfiguration testConfig);
 
+    /// <summary>
+    ///   Event to notify when test config is added
+    /// </summary>
     event Action<IProjectConfiguration, ITestConfiguration> TestConfigAdded;
   }
 
@@ -185,10 +233,32 @@ namespace Cake.Helpers.DotNetCore
     #endregion
   }
 
+  /// <summary>
+  ///   ProjectConfiguration Extensions
+  /// </summary>
   public static class ProjectConfigurationExtensions
   {
     #region Static Members
 
+    /// <summary>
+    ///   Adds test config to project and returns that test config
+    /// </summary>
+    /// <param name="projConfig">ProjectConfiguration</param>
+    /// <param name="testCategory">Test Category (Unit, System, etc)</param>
+    /// <returns>TestConfiguration</returns>
+    /// <example>
+    ///   <code>
+    /// // Creates task "Clean-Build-Sln"
+    /// AddDotNetCoreProject("./my.sln", config => 
+    ///   {
+    ///     config.Framework = "net452";
+    ///     config.AddTestConfig("Unit", testConfig => 
+    ///     {
+    ///       testConfig.Logger = "teamcity";
+    ///     });
+    ///   });
+    /// </code>
+    /// </example>
     public static ITestConfiguration AddTestConfig(this IProjectConfiguration projConfig, string testCategory)
     {
       if (projConfig == null)
@@ -201,7 +271,45 @@ namespace Cake.Helpers.DotNetCore
       return testConfig;
     }
 
-    public static IEnumerable<string> GetAllProjectOutputDirectoryPaths(
+    /// <summary>
+    ///   Gets relative sln file path to current working directory
+    /// </summary>
+    /// <param name="config">ProjectConfiguration</param>
+    /// <returns>Relative Sln FilePath</returns>
+    public static FilePath GetRelativeSlnFilePath(this IProjectConfiguration config)
+    {
+      if (config == null)
+        throw new ArgumentNullException(nameof(config));
+
+      return config.Context.MakeRelative(config.SlnFilePath);
+    }
+
+    /// <summary>
+    ///   Get FilePaths of all SourceProject artifacts. (Artifacts from bin directories)
+    /// </summary>
+    /// <param name="config">ProjectConfiguration</param>
+    /// <returns>Artifact FilePaths</returns>
+    [ExcludeFromCodeCoverage]
+    public static IEnumerable<FilePath> GetSrcProjectArtifacts(
+      this IProjectConfiguration config)
+    {
+      if (config == null)
+        throw new ArgumentNullException(nameof(config));
+
+      return config.SrcProjects
+        .SelectMany(t =>
+        {
+          var outputDirString = t.GetProjectBinOutputDirectoryPath(config);
+          var filePaths = t.GetProjectOutputFileNamePatterns()
+            .Select(x => $"{outputDirString}/{x}")
+            .SelectMany(x => config.Context.GetFiles(x));
+
+          return filePaths;
+        })
+        .Where(t => config.Context.FileExists(t));
+    }
+
+    internal static IEnumerable<string> GetAllProjectOutputDirectoryPaths(
       this IProjectConfiguration config)
     {
       if (config == null)
@@ -215,7 +323,7 @@ namespace Cake.Helpers.DotNetCore
     }
 
     [ExcludeFromCodeCoverage]
-    public static IEnumerable<string> GetProjectOutputDirectoryPaths(
+    internal static IEnumerable<string> GetProjectOutputDirectoryPaths(
       this SolutionProject project,
       IProjectConfiguration config)
     {
@@ -239,7 +347,7 @@ namespace Cake.Helpers.DotNetCore
       return new[] {project.GetProjectBinOutputDirectoryPath(config), project.GetProjectObjOutputDirectoryPath(config)};
     }
 
-    public static IEnumerable<string> GetProjectOutputFileNamePatterns(
+    internal static IEnumerable<string> GetProjectOutputFileNamePatterns(
       this SolutionProject project)
     {
       if (project == null)
@@ -248,34 +356,6 @@ namespace Cake.Helpers.DotNetCore
       yield return $"{project.Name}.dll";
       yield return $"{project.Name}.xml";
       yield return $"{project.Name}.pdb";
-    }
-
-    public static FilePath GetRelativeSlnFilePath(this IProjectConfiguration config)
-    {
-      if (config == null)
-        throw new ArgumentNullException(nameof(config));
-
-      return config.Context.MakeRelative(config.SlnFilePath);
-    }
-
-    [ExcludeFromCodeCoverage]
-    public static IEnumerable<FilePath> GetSrcProjectArtifacts(
-      this IProjectConfiguration config)
-    {
-      if (config == null)
-        throw new ArgumentNullException(nameof(config));
-
-      return config.SrcProjects
-        .SelectMany(t =>
-        {
-          var outputDirString = t.GetProjectBinOutputDirectoryPath(config);
-          var filePaths = t.GetProjectOutputFileNamePatterns()
-            .Select(x => $"{outputDirString}/{x}")
-            .SelectMany(x => config.Context.GetFiles(x));
-
-          return filePaths;
-        })
-        .Where(t => config.Context.FileExists(t));
     }
 
     [ExcludeFromCodeCoverage]

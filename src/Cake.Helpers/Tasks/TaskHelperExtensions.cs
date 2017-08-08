@@ -5,10 +5,19 @@ using Cake.Core;
 
 namespace Cake.Helpers.Tasks
 {
+  /// <summary>
+  /// Task Helper Extensions
+  /// </summary>
   public static class TaskHelperExtensions
   {
     #region Static Members
 
+    /// <summary>
+    /// Adds dependency between tasks
+    /// </summary>
+    /// <param name="helper">TaskHelper</param>
+    /// <param name="task">Task</param>
+    /// <param name="dependentTaskName">Task name</param>
     public static void AddTaskDependency(
       this IHelperTaskHandler helper,
       CakeTaskBuilder<ActionTask> task,
@@ -26,6 +35,12 @@ namespace Cake.Helpers.Tasks
       task.IsDependentOn(dependentTaskName);
     }
 
+    /// <summary>
+    /// Adds dependency between tasks
+    /// </summary>
+    /// <param name="helper">TaskHelper</param>
+    /// <param name="task">Helper Task</param>
+    /// <param name="dependentTaskName">Task name</param>
     public static void AddTaskDependency(
       this IHelperTaskHandler helper,
       IHelperTask task,
@@ -37,6 +52,21 @@ namespace Cake.Helpers.Tasks
       helper.AddTaskDependency(task.GetTaskBuilder(), dependentTaskName);
     }
 
+    /// <summary>
+    /// Adds dependency between tasks
+    /// </summary>
+    /// <param name="helper">TaskHelper</param>
+    /// <param name="task">Helper Task</param>
+    /// <param name="dependentTask">Helper Task</param>
+    /// <example>
+    /// <code>
+    /// var bCleanTask = BuildCleanTask("Sln", true)
+    ///   .Does(() => { "Clean Solution" });
+    /// var bTask = BuildTask("Sln", true)
+    ///   .Does(() => { "Build Solution" });
+    /// TaskHelper.AddTaskDependency(bTask, bCleanTask);
+    /// </code>
+    /// </example>
     public static void AddTaskDependency(
       this IHelperTaskHandler helper,
       IHelperTask task,
@@ -48,6 +78,18 @@ namespace Cake.Helpers.Tasks
       helper.AddTaskDependency(task, dependentTask.TaskName);
     }
 
+    /// <summary>
+    /// Gets a Task Builder (with Does, IsDependentOn, etc) for Helper Task
+    /// </summary>
+    /// <param name="task">Helper Task</param>
+    /// <returns>Task Builder</returns>
+    /// <example>
+    /// <code>
+    /// var bCleanTask = TaskHelper.AddTask("TaskTest");
+    /// bCleanTask.GetTaskBuilder()
+    ///   .Does(() => { "Clean Solution" });
+    /// </code>
+    /// </example>
     public static CakeTaskBuilder<ActionTask> GetTaskBuilder(this IHelperTask task)
     {
       if (task == null)
@@ -56,6 +98,19 @@ namespace Cake.Helpers.Tasks
       return new CakeTaskBuilder<ActionTask>(task.Task);
     }
 
+    /// <summary>
+    /// Adds or Gets task marked as public target
+    /// </summary>
+    /// <param name="helper">TaskHelper</param>
+    /// <param name="taskName">Task/Target Name</param>
+    /// <param name="category">Task Category</param>
+    /// <param name="taskType">Task Type</param>
+    /// <returns>Helper Task</returns>
+    /// <example>
+    /// <code>
+    /// var bCleanTask = TaskHelper.GetTargetTask("TaskTest");
+    /// </code>
+    /// </example>
     public static IHelperTask GetTargetTask(
       this IHelperTaskHandler helper,
       string taskName,
@@ -65,12 +120,12 @@ namespace Cake.Helpers.Tasks
       return helper.GetTask(taskName, true, category, taskType);
     }
 
-    public static IEnumerable<string> GetCategories(this IEnumerable<IHelperTask> tasks)
+    internal static IEnumerable<string> GetCategories(this IEnumerable<IHelperTask> tasks)
     {
       return tasks.Select(t => t.Category).Distinct();
     }
 
-    public static IEnumerable<string> GetCategories(this IHelperTaskHandler helper)
+    internal static IEnumerable<string> GetCategories(this IHelperTaskHandler helper)
     {
       if (helper == null)
         return Enumerable.Empty<string>();
@@ -78,11 +133,30 @@ namespace Cake.Helpers.Tasks
       return helper.Tasks.GetCategories();
     }
 
+    /// <summary>
+    /// Gets all Tasks marked as Targets
+    /// </summary>
+    /// <param name="tasks">All Tasks</param>
+    /// <returns>Target Tasks</returns>
     public static IEnumerable<IHelperTask> GetTargetTasks(this IEnumerable<IHelperTask> tasks)
     {
       return tasks.Where(t => t.IsTarget);
     }
 
+    /// <summary>
+    /// Adds or Gets task marked as public target
+    /// </summary>
+    /// <param name="helper">TaskHelper</param>
+    /// <param name="taskName">Task/Target Name</param>
+    /// <param name="isTarget">True=Public Target(Listed),False=Private Target(Not Listed)</param>
+    /// <param name="category">Task Category</param>
+    /// <param name="taskType">Task Type</param>
+    /// <returns>Helper Task</returns>
+    /// <example>
+    /// <code>
+    /// var bCleanTask = TaskHelper.GetTask("TaskTest", false);
+    /// </code>
+    /// </example>
     public static IHelperTask GetTask(
       this IHelperTaskHandler helper,
       string taskName,
@@ -98,7 +172,7 @@ namespace Cake.Helpers.Tasks
       return task;
     }
 
-    public static IEnumerable<CakeTaskBuilder<ActionTask>> GetTaskBuilders(this IEnumerable<IHelperTask> tasks)
+    internal static IEnumerable<CakeTaskBuilder<ActionTask>> GetTaskBuilders(this IEnumerable<IHelperTask> tasks)
     {
       return tasks.Select(task => task.GetTaskBuilder());
     }

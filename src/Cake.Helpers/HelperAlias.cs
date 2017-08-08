@@ -9,9 +9,22 @@ using Cake.Helpers.Settings;
 
 namespace Cake.Helpers
 {
+  /// <summary>
+  /// Cake Helper Aliases
+  /// </summary>
   [CakeAliasCategory("Helper")]
   public static class HelperAlias
   {
+    /// <summary>
+    /// Cake Property to get HelperSettings
+    /// </summary>
+    /// <param name="context">CakeContext</param>
+    /// <returns>HelperSettings</returns>
+    /// <example>
+    /// <code>
+    /// var settings = HelperSettings;
+    /// </code>
+    /// </example>
     [CakePropertyAlias]
     public static IHelperSettings HelperSettings(this ICakeContext context)
     {

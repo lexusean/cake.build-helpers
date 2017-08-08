@@ -1,17 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Cake.Core;
+﻿using Cake.Core;
 
 namespace Cake.Helpers
 {
+  /// <summary>
+  ///   Helper Contract
+  /// </summary>
   public interface IHelper
   { }
 
+  /// <summary>
+  ///   Helper With Context Contract
+  /// </summary>
+  /// <inheritdoc />
   public interface IHelperContext : IHelper
   {
+    /// <summary>
+    ///   Cake Context
+    /// </summary>
     ICakeContext Context { get; set; }
   }
 }

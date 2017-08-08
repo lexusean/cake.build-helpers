@@ -3,10 +3,19 @@
   <PropertyGroup>
     <TargetFrameworks>net452</TargetFrameworks>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net452|AnyCPU'">
+    <DocumentationFile>bin\Debug\net452\Cake.Helpers.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net452|AnyCPU'">
+    <DocumentationFile>bin\Release\net452\Cake.Helpers.xml</DocumentationFile>
+  </PropertyGroup>
   
   <ItemGroup>
     <PackageReference Include="Cake.Core" Version="0.21.1" />
 		<PackageReference Include="Cake.Common" Version="0.21.1" />
+		<PackageReference Include="Cake.DocFx" Version="0.4.1" />
   </ItemGroup>
 
 </Project>

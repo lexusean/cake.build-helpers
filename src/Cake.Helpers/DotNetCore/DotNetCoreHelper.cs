@@ -13,19 +13,49 @@ using Cake.Common.Tools.DotNetCore.Restore;
 using Cake.Common.Tools.DotNetCore.Test;
 using Cake.Core;
 using Cake.Core.IO;
+using Cake.DocFx;
+using Cake.DocFx.Build;
+using Cake.DocFx.Metadata;
 using Cake.Helpers.Build;
+using Cake.Helpers.Documentation;
 using Cake.Helpers.Settings;
 using Cake.Helpers.Test;
 
 namespace Cake.Helpers.DotNetCore
 {
+  /// <inheritdoc />
+  /// <summary>
+  /// DotNetCore Helper Contract
+  /// </summary>
   public interface IDotNetCoreHelper : IHelperContext
   {
+    /// <summary>
+    /// Location for PostBuild artifacts
+    /// </summary>
     DirectoryPath BuildTempFolder { get; }
+    /// <summary>
+    /// Location for test results
+    /// </summary>
     DirectoryPath TestTempFolder { get; }
+    /// <summary>
+    /// Projects Defined
+    /// </summary>
     IEnumerable<IProjectConfiguration> Projects { get; }
+    /// <summary>
+    /// Test configurations defined for all projects
+    /// </summary>
     IEnumerable<ITestConfiguration> Tests { get; }
+    /// <summary>
+    /// Gets project config for sln path
+    /// </summary>
+    /// <param name="slnFilePath">relative path to sln file</param>
+    /// <returns>ProjectConfiguration</returns>
     IProjectConfiguration GetProjectConfiguration(FilePath slnFilePath);
+    /// <summary>
+    /// Adds project configuration to DotNetCore Helper
+    /// </summary>
+    /// <param name="projConfig">Project Configuration</param>
+    /// <returns>Added Project Configuration</returns>
     IProjectConfiguration AddProjectConfiguration(IProjectConfiguration projConfig);
   }
 
@@ -197,6 +227,35 @@ namespace Cake.Helpers.DotNetCore
         });
     }
 
+    [ExcludeFromCodeCoverage]
+    private void RegisterDocTasks(IProjectConfiguration projConfig)
+    {
+      if(this._helperSettings.DotNetCoreSettings.DocConfigs.Any())
+        this.Context.DocBuildTask(projConfig.ProjectAlias);
+
+      foreach (var docConfig in this._helperSettings.DotNetCoreSettings.DocFxConfigurations())
+      {
+        var docfxDirectory = docConfig.GetDocFxDirectoryPath();
+
+        this.Context.DocExtractTask("BuildDocs", false, projConfig.ProjectAlias)
+          .Does(() =>
+          {
+            this.Context.DocFxBuild(new DocFxBuildSettings()
+            {
+              WorkingDirectory = docfxDirectory
+            });
+          });
+        this.Context.DocBuildTask("BuildDocs", false, projConfig.ProjectAlias)
+          .Does(() =>
+          {
+            this.Context.DocFxMetadata(new DocFxMetadataSettings()
+            {
+              WorkingDirectory = docfxDirectory
+            });
+          });
+      }
+    }
+
     #endregion
 
     #region IDotNetCoreHelper Members
@@ -232,6 +291,7 @@ namespace Cake.Helpers.DotNetCore
       this.RegisterPreBuildTasks(projConfig);
       this.RegisterBuildTasks(projConfig);
       this.RegisterPostBuildTasks(projConfig);
+      this.RegisterDocTasks(projConfig);
 
       foreach (var testConfig in projConfig.TestConfigurations)
       {
@@ -260,10 +320,29 @@ namespace Cake.Helpers.DotNetCore
     #endregion
   }
 
+  /// <summary>
+  /// DotNetCoreHelper Extensions
+  /// </summary>
   public static class DotNetCoreHelperExtensions
   {
     #region Static Members
 
+    /// <summary>
+    /// Adds project configuration for sln file and allows config setup
+    /// </summary>
+    /// <param name="helper">DotNetCoreHelper</param>
+    /// <param name="filePathStr">Relative Path to sln file</param>
+    /// <param name="setupConfig">Project Configuration Setup</param>
+    /// <returns>ProjectConfiguration</returns>
+    /// <example>
+    /// <code>
+    /// var helper = SingletonFactory.GetDotNetCoreHelper();
+    /// helper.AddProjectConfiguration("./my.sln", config =>
+    ///   {
+    ///     config.Framework = "net452";
+    ///   });
+    /// </code>
+    /// </example>
     public static IProjectConfiguration AddProjectConfiguration(
       this IDotNetCoreHelper helper,
       string filePathStr,

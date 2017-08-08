@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Cake.Common;
 using Cake.Common.Diagnostics;
@@ -9,23 +10,60 @@ using Cake.Helpers.Tasks;
 
 namespace Cake.Helpers.Command
 {
+  /// <summary>
+  /// Command Helper Contract
+  /// </summary>
   public interface ICommandHelper : IHelperContext
   {
+    /// <summary>
+    /// List of defined arguments
+    /// </summary>
     IEnumerable<ICommandArgument> Arguments { get; }
+    /// <summary>
+    /// Help Argument - Lists help descriptions
+    /// </summary>
     ICommandArgument HelpArgument { get; }
+    /// <summary>
+    /// Run Argument - Runs target defined
+    /// </summary>
     ICommandArgument RunArgument { get; }
+    /// <summary>
+    /// Available Targets argument - Lists all public targets defined 
+    /// </summary>
     ICommandArgument AvailableTargetsArgument { get; }
+    /// <summary>
+    /// Default target to run (Empty)
+    /// </summary>
     string DefaultTarget { get; set; }
+    /// <summary>
+    /// Description of script to list in help
+    /// </summary>
     string ScriptDescription { get; set; }
+    /// <summary>
+    /// Add argument to command helper
+    /// </summary>
+    /// <param name="name">Long name</param>
+    /// <param name="shortName">Short Name</param>
+    /// <param name="desc">description</param>
+    /// <returns>Command Argument</returns>
+    /// <example>
+    /// <code>
+    /// var newArg = CommandHelper.AddArgument("test", "t", "Testing stuff");
+    /// newArg.ArgumentAction = () => { "Do Something" };
+    /// </code>
+    /// </example>
     ICommandArgument AddArgument(string name, string shortName, string desc);
+    /// <summary>
+    /// Runs any command defined in Cake commandline.
+    /// </summary>
     void Run();
   }
 
-  public class CommandHelper : ICommandHelper
+  internal class CommandHelper : ICommandHelper
   {
-    #region Private Properties
+    #region Internal Properties
 
-    private ITaskHelper TaskHelper { get; }
+    internal ITaskHelper TaskHelper { get; }
 
     #endregion
 
@@ -45,12 +83,14 @@ namespace Cake.Helpers.Command
         throw new ArgumentNullException(nameof(taskHelper));
 
       this.TaskHelper = taskHelper;
+      this.AddDefaultArguments();
     }
 
     #endregion
 
     #region Private Methods
 
+    [ExcludeFromCodeCoverage]
     private void AddAvailableTargetsArgument()
     {
       var desc = "Action: -available-targets | -at\n";
@@ -90,6 +130,7 @@ namespace Cake.Helpers.Command
       };
     }
 
+    [ExcludeFromCodeCoverage]
     private void AddAvailTargetsArgumentForTask(
       IEnumerable<IHelperTask> allTargets,
       IHelperTask task,
@@ -137,6 +178,7 @@ namespace Cake.Helpers.Command
       this.HelpArgument = this.AddArgument("support", "h", desc);
     }
 
+    [ExcludeFromCodeCoverage]
     private void AddRunArgument()
     {
       var desc = "Action: -run | -r\n";
@@ -166,6 +208,7 @@ namespace Cake.Helpers.Command
       };
     }
 
+    [ExcludeFromCodeCoverage]
     private void RunHelp(ICommandArgument arg = null)
     {
       this.Context.Information("\n");
@@ -242,6 +285,7 @@ namespace Cake.Helpers.Command
       return arg;
     }
 
+    [ExcludeFromCodeCoverage]
     public void Run()
     {
       this._helperSettings.SetupSetting();
@@ -282,10 +326,25 @@ namespace Cake.Helpers.Command
     #endregion
   }
 
+  /// <summary>
+  /// Extensions for CommandHelper and Dependencies
+  /// </summary>
   public static class CommandHelperExtensions
   {
     #region Static Members
 
+    /// <summary>
+    /// Gets argument value from Cake commandline.
+    /// </summary>
+    /// <param name="arg">Command Argument</param>
+    /// <param name="context">Cake Context</param>
+    /// <returns>Value as string if defined. Empty string if not defined.</returns>
+    /// <example>
+    /// <code>
+    /// var newArg = CommandHelper.AddArgument("test", "t", "Testing stuff");
+    /// var argVal = newArg.GetArgumentValue(Context)
+    /// </code>
+    /// </example>
     public static string GetArgumentValue(this ICommandArgument arg, ICakeContext context)
     {
       if (arg == null)
@@ -303,6 +362,18 @@ namespace Cake.Helpers.Command
       return shortArgValue;
     }
 
+    /// <summary>
+    /// Gets if argument defined in Cake commandline
+    /// </summary>
+    /// <param name="arg">Command Argument</param>
+    /// <param name="context">Cake Context</param>
+    /// <returns>True if it exists, false otherwise</returns>
+    /// <example>
+    /// <code>
+    /// var newArg = CommandHelper.AddArgument("test", "t", "Testing stuff");
+    /// var hasArg = newArg.HasArgument(Context)
+    /// </code>
+    /// </example>
     public static bool HasArgument(this ICommandArgument arg, ICakeContext context)
     {
       if (arg == null)

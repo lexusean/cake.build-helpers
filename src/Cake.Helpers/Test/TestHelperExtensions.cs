@@ -6,7 +6,7 @@ using Cake.Helpers.Tasks;
 
 namespace Cake.Helpers.Test
 {
-  public static class TestHelperExtensions
+  internal static class TestHelperExtensions
   {
     #region Constants
 

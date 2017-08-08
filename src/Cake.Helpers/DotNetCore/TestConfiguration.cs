@@ -4,23 +4,53 @@ using Cake.Core;
 
 namespace Cake.Helpers.DotNetCore
 {
+  /// <summary>
+  /// Testing Framework Types for DotNetCore
+  /// </summary>
   public enum TestTypeEnum
   {
+    /// <summary>
+    /// Uses VsTest
+    /// </summary>
     Default,
+    /// <summary>
+    /// Uses VsTest
+    /// </summary>
     MsTest,
+    /// <summary>
+    /// Uses VsTest
+    /// </summary>
     VsTest,
+    /// <summary>
+    /// Uses NUnit v3
+    /// </summary>
     NUnit,
+    /// <summary>
+    /// Uses Xunit
+    /// </summary>
     XUnit
   }
 
+  /// <summary>
+  /// Test Configuration Contract
+  /// </summary>
   public interface ITestConfiguration : IHelperContext
   {
+    /// <summary>
+    /// Test Category to run
+    /// </summary>
     string TestCategory { get; set; }
+    /// <summary>
+    /// Testing Framework
+    /// </summary>
     TestTypeEnum TestType { get; set; }
+    /// <summary>
+    /// Logger name to set on /logger: commandline for testing framework. Defaults to trx
+    /// </summary>
     string Logger { get; set; }
   }
 
-  public class TestConfiguration : ITestConfiguration
+  internal class TestConfiguration : ITestConfiguration
   {
     #region Private Fields
 
@@ -70,11 +100,14 @@ namespace Cake.Helpers.DotNetCore
     #endregion
   }
 
+  /// <summary>
+  /// TestConfiguration Extensions
+  /// </summary>
   public static class TestConfigurationExtensions
   {
     #region Static Members
 
-    public static string GetDotNetCoreCategoryString(this ITestConfiguration config)
+    internal static string GetDotNetCoreCategoryString(this ITestConfiguration config)
     {
       if (config == null)
         throw new ArgumentNullException(nameof(config));

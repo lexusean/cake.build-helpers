@@ -1,40 +1,77 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Cake.Helpers.Command
 {
+  /// <summary>
+  ///   Command Argument
+  /// </summary>
   public interface ICommandArgument
   {
+    /// <summary>
+    ///   Long Name of Command Argument
+    /// </summary>
     string Name { get; set; }
+
+    /// <summary>
+    ///   Short name of Command Argument
+    /// </summary>
     string Shortname { get; set; }
+
+    /// <summary>
+    ///   Description of Command Argument
+    /// </summary>
     string Description { get; set; }
+
+    /// <summary>
+    ///   Sub Arguments
+    /// </summary>
     List<ICommandArgument> Arguments { get; }
+
+    /// <summary>
+    ///   Action to be executed when command argument defined
+    /// </summary>
     Action<ICommandArgument> ArgumentAction { get; set; }
   }
 
+  /// <inheritdoc />
+  [ExcludeFromCodeCoverage]
   public class CommandArgument : ICommandArgument
   {
-    public string Name { get; set; }
-    public string Shortname { get; set; }
-    public string Description { get; set; }
-    public List<ICommandArgument> Arguments { get; } = new List<ICommandArgument>();
+    #region Private Fields
 
-    private Action<ICommandArgument> _ArgumentAction = null;
+    private Action<ICommandArgument> _ArgumentAction;
+
+    #endregion
+
+    #region ICommandArgument Members
+
+    /// <inheritdoc />
     public Action<ICommandArgument> ArgumentAction
     {
       get
       {
         if (this._ArgumentAction == null)
-        {
           this._ArgumentAction = arg => { };
-        }
 
         return this._ArgumentAction;
       }
       set { this._ArgumentAction = value; }
     }
+
+    /// <inheritdoc />
+    public List<ICommandArgument> Arguments { get; } = new List<ICommandArgument>();
+
+    /// <inheritdoc />
+    public string Description { get; set; }
+
+    /// <inheritdoc />
+    public string Name { get; set; }
+
+    /// <inheritdoc />
+    public string Shortname { get; set; }
+
+    #endregion
   }
 }

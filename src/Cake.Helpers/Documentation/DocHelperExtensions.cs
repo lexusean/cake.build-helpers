@@ -4,22 +4,22 @@ using Cake.Core;
 using Cake.Helpers.Clean;
 using Cake.Helpers.Tasks;
 
-namespace Cake.Helpers.Build
+namespace Cake.Helpers.Documentation
 {
-  internal static class BuildHelperExtensions
+  internal static class DocHelperExtensions
   {
     #region Constants
 
-    private const string BuildTaskName = "Build";
-    private const string PostBuildTaskName = "PostBuild";
-    private const string PreBuildTaskName = "PreBuild";
-    private const string TargetCategory = "Build";
+    private const string DocExtractTaskName = "DocExtract";
+    private const string DocBuildTaskName = "DocBuild";
+    private const string DocPostBuildTaskName = "DocPostBuild";
+    private const string TargetCategory = "Doc";
 
     #endregion
 
     #region Static Members
 
-    internal static IHelperTask AddToBuildCleanTask(
+    internal static IHelperTask AddToDocCleanTask(
       this ITaskHelper helper,
       string targetName,
       bool isTarget = true,
@@ -28,7 +28,7 @@ namespace Cake.Helpers.Build
       return helper.AddToCleanTask(targetName, TargetCategory, isTarget, parentTaskName);
     }
 
-    internal static IHelperTask AddToBuildTask(
+    internal static IHelperTask AddToDocExtractTask(
       this ITaskHelper helper,
       string targetName,
       bool isTarget = true,
@@ -41,15 +41,15 @@ namespace Cake.Helpers.Build
         throw new ArgumentNullException(nameof(parentTaskName));
 
       var newTaskName = isTarget ? targetName : $"{parentTaskName}-{targetName}";
-      var parentTask = isTarget ? helper.GetBuildTask() : helper.AddToBuildTask(parentTaskName);
-      var newTask = helper.GetBuildTask(newTaskName, isTarget);
+      var parentTask = isTarget ? helper.GetDocExtractTask() : helper.AddToDocExtractTask(parentTaskName);
+      var newTask = helper.GetDocExtractTask(newTaskName, isTarget);
 
       helper.AddTaskDependency(parentTask, newTask);
 
       return newTask;
     }
 
-    internal static IHelperTask AddToPostBuildTask(
+    internal static IHelperTask AddToDocBuildTask(
       this ITaskHelper helper,
       string targetName,
       bool isTarget = true,
@@ -62,15 +62,15 @@ namespace Cake.Helpers.Build
         throw new ArgumentNullException(nameof(parentTaskName));
 
       var newTaskName = isTarget ? targetName : $"{parentTaskName}-{targetName}";
-      var parentTask = isTarget ? helper.GetPostBuildTask() : helper.AddToPostBuildTask(parentTaskName);
-      var newTask = helper.GetPostBuildTask(newTaskName, isTarget);
+      var parentTask = isTarget ? helper.GetDocBuildTask() : helper.AddToDocBuildTask(parentTaskName);
+      var newTask = helper.GetDocBuildTask(newTaskName, isTarget);
 
       helper.AddTaskDependency(parentTask, newTask);
 
       return newTask;
     }
 
-    internal static IHelperTask AddToPreBuildTask(
+    internal static IHelperTask AddToDocPostBuildTask(
       this ITaskHelper helper,
       string targetName,
       bool isTarget = true,
@@ -83,8 +83,8 @@ namespace Cake.Helpers.Build
         throw new ArgumentNullException(nameof(parentTaskName));
 
       var newTaskName = isTarget ? targetName : $"{parentTaskName}-{targetName}";
-      var parentTask = isTarget ? helper.GetPreBuildTask() : helper.AddToPreBuildTask(parentTaskName);
-      var newTask = helper.GetPreBuildTask(newTaskName, isTarget);
+      var parentTask = isTarget ? helper.GetDocPostBuildTask() : helper.GetDocPostBuildTask(parentTaskName);
+      var newTask = helper.GetDocPostBuildTask(newTaskName, isTarget);
 
       helper.AddTaskDependency(parentTask, newTask);
 
@@ -92,7 +92,7 @@ namespace Cake.Helpers.Build
     }
 
     [ExcludeFromCodeCoverage]
-    internal static IHelperTask GetBuildCleanTask(
+    internal static IHelperTask GetDocCleanTask(
       this ITaskHelper helper,
       string targetName = "All",
       bool isTarget = true)
@@ -108,7 +108,7 @@ namespace Cake.Helpers.Build
     }
 
     [ExcludeFromCodeCoverage]
-    internal static IHelperTask GetBuildTask(
+    internal static IHelperTask GetDocExtractTask(
       this ITaskHelper helper,
       string targetName = "All",
       bool isTarget = true)
@@ -116,19 +116,39 @@ namespace Cake.Helpers.Build
       if (helper == null)
         return null;
 
-      var buildTask = helper.GetTask($"{BuildTaskName}-{targetName}", isTarget, TargetCategory, BuildTaskName);
+      var buildTask = helper.GetTask($"{DocExtractTaskName}-{targetName}", isTarget, TargetCategory, DocExtractTaskName);
 
       if (isTarget)
       {
-        var preBuildTask = helper.GetPreBuildTask(targetName);
-        helper.AddTaskDependency(buildTask, preBuildTask);
+        var clnTask = helper.GetDocCleanTask(targetName);
+        helper.AddTaskDependency(buildTask, clnTask);
       }
 
       return buildTask;
     }
 
     [ExcludeFromCodeCoverage]
-    internal static IHelperTask GetPostBuildTask(
+    internal static IHelperTask GetDocBuildTask(
+      this ITaskHelper helper,
+      string targetName = "All",
+      bool isTarget = true)
+    {
+      if (helper == null)
+        return null;
+
+      var buildTask = helper.GetTask($"{DocBuildTaskName}-{targetName}", isTarget, TargetCategory, DocBuildTaskName);
+
+      if (isTarget)
+      {
+        var extractTask = helper.GetDocExtractTask(targetName);
+        helper.AddTaskDependency(buildTask, extractTask);
+      }
+
+      return buildTask;
+    }
+
+    [ExcludeFromCodeCoverage]
+    internal static IHelperTask GetDocPostBuildTask(
       this ITaskHelper helper,
       string targetName = "All",
       bool isTarget = true)
@@ -137,35 +157,15 @@ namespace Cake.Helpers.Build
         return null;
 
       var postBuildTask =
-        helper.GetTask($"{PostBuildTaskName}-{targetName}", isTarget, TargetCategory, PostBuildTaskName);
+        helper.GetTask($"{DocPostBuildTaskName}-{targetName}", isTarget, TargetCategory, DocPostBuildTaskName);
 
       if (isTarget && helper.BuildAllDependencies)
       {
-        var buildTask = helper.GetBuildTask(targetName);
+        var buildTask = helper.GetDocBuildTask(targetName);
         helper.AddTaskDependency(postBuildTask, buildTask);
       }
 
       return postBuildTask;
-    }
-
-    [ExcludeFromCodeCoverage]
-    internal static IHelperTask GetPreBuildTask(
-      this ITaskHelper helper,
-      string targetName = "All",
-      bool isTarget = true)
-    {
-      if (helper == null)
-        return null;
-
-      var preBuildTask = helper.GetTask($"{PreBuildTaskName}-{targetName}", isTarget, TargetCategory, PreBuildTaskName);
-
-      if (isTarget)
-      {
-        var clnTask = helper.GetBuildCleanTask(targetName);
-        helper.AddTaskDependency(preBuildTask, clnTask);
-      }
-
-      return preBuildTask;
     }
 
     #endregion

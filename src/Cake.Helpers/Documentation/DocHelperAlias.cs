@@ -8,17 +8,17 @@ using Cake.Core;
 using Cake.Helpers.Clean;
 using Cake.Helpers.Tasks;
 
-namespace Cake.Helpers.Build
+namespace Cake.Helpers.Documentation
 {
   /// <summary>
   /// Cake Generic Build Task Aliases
   /// </summary>
   [CakeAliasCategory("Helper")]
-  [CakeAliasCategory("Build")]
-  public static class BuildHelperAlias
+  [CakeAliasCategory("Doc")]
+  public static class DocHelperAlias
   {
     /// <summary>
-    /// Gets Build Clean Task for defined parameters
+    /// Gets Documentation Clean Task for defined parameters
     /// </summary>
     /// <param name="context">Cake Context</param>
     /// <param name="taskName">Target Name</param>
@@ -27,13 +27,15 @@ namespace Cake.Helpers.Build
     /// <returns>Task</returns>
     /// <example>
     /// <code>
-    /// // Creates task "Clean-Build-Sln"
-    /// BuildCleanTask("Sln", true)
-    ///   .Does(() => { "Clean Solution" });
+    /// // Creates task "Clean-All"
+    /// // Creates task "Clean-Doc-All"
+    /// // Creates task "Clean-Doc-Sln"
+    /// DocCleanTask("Sln", true)
+    ///   .Does(() => { "Clean Doc" });
     /// </code>
     /// </example>
     [CakeMethodAlias]
-    public static CakeTaskBuilder<ActionTask> BuildCleanTask(
+    public static CakeTaskBuilder<ActionTask> DocCleanTask(
       this ICakeContext context,
       string taskName,
       bool isTarget = true,
@@ -43,12 +45,12 @@ namespace Cake.Helpers.Build
         throw new ArgumentNullException(nameof(context));
 
       return context.TaskHelper()
-        .AddToBuildCleanTask(taskName, isTarget, parentTaskName)
+        .AddToDocCleanTask(taskName, isTarget, parentTaskName)
         .GetTaskBuilder();
     }
 
     /// <summary>
-    /// Gets PreBuild task for defined parameters. Runs associated BuildClean task as dependency always
+    /// Gets DocExtract task for defined parameters. Runs associated DocClean task as dependency always
     /// </summary>
     /// <param name="context">Cake Context</param>
     /// <param name="taskName">Target Name</param>
@@ -57,13 +59,14 @@ namespace Cake.Helpers.Build
     /// <returns>Task</returns>
     /// <example>
     /// <code>
-    /// // Creates task "PreBuild-Sln"
-    /// PreBuildTask("Sln", true)
-    ///   .Does(() => { "Restore Solution" });
+    /// // Creates task "DocExtract-All"
+    /// // Creates task "DocExtract-Sln"
+    /// DocExtractTask("Sln", true)
+    ///   .Does(() => { "Extract Doc From Solution" });
     /// </code>
     /// </example>
     [CakeMethodAlias]
-    public static CakeTaskBuilder<ActionTask> PreBuildTask(
+    public static CakeTaskBuilder<ActionTask> DocExtractTask(
       this ICakeContext context,
       string taskName,
       bool isTarget = true,
@@ -73,12 +76,12 @@ namespace Cake.Helpers.Build
         throw new ArgumentNullException(nameof(context));
 
       return context.TaskHelper()
-        .AddToPreBuildTask(taskName, isTarget, parentTaskName)
+        .AddToDocExtractTask(taskName, isTarget, parentTaskName)
         .GetTaskBuilder();
     }
 
     /// <summary>
-    /// Gets Build task for defined parameters. Runs associated PreBuild task as dependency always
+    /// Gets DocBuild task for defined parameters. Runs associated DocExtract task as dependency always
     /// </summary>
     /// <param name="context">Cake Context</param>
     /// <param name="taskName">Target Name</param>
@@ -87,13 +90,14 @@ namespace Cake.Helpers.Build
     /// <returns>Task</returns>
     /// <example>
     /// <code>
-    /// // Creates task "Build-Sln"
-    /// BuildTask("Sln", true)
-    ///   .Does(() => { "Build Solution" });
+    /// // Creates task "DocBuild-All"
+    /// // Creates task "DocBuild-Sln"
+    /// DocBuildTask("Sln", true)
+    ///   .Does(() => { "Build Doc From Solution" });
     /// </code>
     /// </example>
     [CakeMethodAlias]
-    public static CakeTaskBuilder<ActionTask> BuildTask(
+    public static CakeTaskBuilder<ActionTask> DocBuildTask(
       this ICakeContext context,
       string taskName,
       bool isTarget = true,
@@ -103,12 +107,12 @@ namespace Cake.Helpers.Build
         throw new ArgumentNullException(nameof(context));
 
       return context.TaskHelper()
-        .AddToBuildTask(taskName, isTarget, parentTaskName)
+        .AddToDocBuildTask(taskName, isTarget, parentTaskName)
         .GetTaskBuilder();
     }
 
     /// <summary>
-    /// Gets PostBuild task for defined parameters. Runs associated Build task as dependency only if HelperSettings.RunAllDependencies = True
+    /// Gets DocPostBuild task for defined parameters. Runs associated DocExtract task as dependency always
     /// </summary>
     /// <param name="context">Cake Context</param>
     /// <param name="taskName">Target Name</param>
@@ -117,13 +121,14 @@ namespace Cake.Helpers.Build
     /// <returns>Task</returns>
     /// <example>
     /// <code>
-    /// // Creates task "PostBuild-Sln"
-    /// PostBuildTask("Sln", true)
-    ///   .Does(() => { "Copy Artifacts somewhere" });
+    /// // Creates task "DocBuild-All"
+    /// // Creates task "DocBuild-Sln"
+    /// DocPostBuildTask("Sln", true)
+    ///   .Does(() => { "Copy Doc From Solution" });
     /// </code>
     /// </example>
     [CakeMethodAlias]
-    public static CakeTaskBuilder<ActionTask> PostBuildTask(
+    public static CakeTaskBuilder<ActionTask> DocPostBuildTask(
       this ICakeContext context,
       string taskName,
       bool isTarget = true,
@@ -133,7 +138,7 @@ namespace Cake.Helpers.Build
         throw new ArgumentNullException(nameof(context));
 
       return context.TaskHelper()
-        .AddToPostBuildTask(taskName, isTarget, parentTaskName)
+        .AddToDocPostBuildTask(taskName, isTarget, parentTaskName)
         .GetTaskBuilder();
     }
   }
